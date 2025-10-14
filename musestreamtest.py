@@ -1,7 +1,7 @@
 import subprocess
 import time
 import csv
-from pylsl import StreamInlet, resolve_stream
+from pylsl import StreamInlet, resolve_byprop
 
 # ---------- CONFIG ----------
 CSV_FILENAME = "muse2_eeg_data.csv"
@@ -15,12 +15,15 @@ def start_muse_stream():
     print(f"[OK] Muse stream process started (PID: {proc.pid})")
     return proc
 
-def connect_to_stream(stream_type="EEG"):
+def connect_to_stream(stream_type="EEG", timeout=5):
     """Find and connect to the Muse EEG stream."""
     print(f"[INFO] Waiting {STREAM_START_DELAY}s for stream to initialize...")
     time.sleep(STREAM_START_DELAY)
-    print(f"[INFO] Looking for {stream_type} stream...")
-    streams = resolve_stream('type', stream_type)
+    print(f"[INFO] Looking for {stream_type} stream (timeout={timeout}s)...")
+    # resolve_byprop(prop, value, timeout) is the pylsl helper to find streams by property
+    streams = resolve_byprop('type', stream_type, timeout=timeout)
+    if not streams:
+        raise RuntimeError(f"No LSL stream found with type='{stream_type}'")
     inlet = StreamInlet(streams[0])
     print(f"[OK] Connected to {stream_type} stream!")
     return inlet
