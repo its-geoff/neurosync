@@ -9,9 +9,8 @@ import matplotlib
 [x] extract data from csv
 [x] print data from four channels and combine data
 [x] convert from mV to Hz
-[ ] split data based on wave frequency
-[ ] put each frequency into separate data structure
-[ ] run preliminary tests on each frequency, checking for min, max, and variance
+[x] calculate band power and add to new df
+[ ] run preliminary tests on each power, checking for min, max, and variance
 [x] create alternative output format that is human readable (ex: table)
 [ ] output data structures in desired output format
 
@@ -26,6 +25,8 @@ Notes:
     - keep rows intact to show emotional state at a point in time
     - channels do matter; frontal channels more important in emotional detection
     - don't remove or combine channels arbitrarily
+
+    * double check if band power is correct; not sure if we should be seeing powers >2^5
 """
 
 # global variables
