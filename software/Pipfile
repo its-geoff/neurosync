@@ -7,8 +7,11 @@ name = "pypi"
 numpy = "*"
 pandas = "*"
 scipy = "*"
-matplotlib = "*"
 tabulate = "*"
+pylsl = "*"
+matplotlib = "*"
+pathlib = "*"
+argparse = "*"
 
 [dev-packages]
 

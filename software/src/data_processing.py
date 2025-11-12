@@ -29,8 +29,8 @@ Notes:
     * double check if band power is correct; not sure if we should be seeing powers >2^5
 """
 
-# global variables
-folder_name = os.path.abspath("..\data")
+# global variables - check compatibility of \ and / between windows and mac
+folder_name = os.path.abspath("../data")
 
 def get_data(file_name):
     """
