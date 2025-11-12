@@ -54,21 +54,28 @@ def transform_to_hz(data):
     Returns:
 
     """
-    samp_rate = 256             # sampling rate of Muse 2 headband
-    n = len(data)               # number of tests
-    channels = data.columns     # get column headers
+    window_size = 256                                   # sampling rate of Muse 2 headband
+    step_size = 128                                     # 50% overlap between windows
+    columns = ['delta', 'theta', 'alpha', 'beta']       # FFT DataFrame columns
+    fft_df = pd.DataFrame(columns=columns)              # define FFT DataFrame
 
     # FFT for all channels
-    fft_data = {}               # dictionary to hold FFT values
-
-    for ch in channels:
-        signal = data[ch].to_numpy()
-        fft_out = fft(signal)
-        fft_data[ch] = np.abs(fft_out[:n // 2])   # take positive output and only consider first half since second half is negative
+    for start in range(0, len(data) - window_size, step_size):
+        window = data[start:start + window_size]
+        fft_vals = fft(window, axis=0)
+        freqs = fftfreq(window_size, 1 / window_size)
     
-    freqs = fftfreq(n, 1 / samp_rate)[:n // 2]           # convert FFT values to usable frequencies
-    fft_data['freq'] = freqs
-    fft_df = pd.DataFrame(fft_data)
+        # compute bands; square for band power
+        delta_band = np.sum(abs(fft_vals[(freqs >= 0.5) & (freqs < 4)]) ** 2)
+        theta_band = np.sum(abs(fft_vals[(freqs >= 4) & (freqs < 8)]) ** 2)
+        alpha_band = np.sum(abs(fft_vals[(freqs >= 8) & (freqs < 13)]) ** 2)
+        beta_band = np.sum(abs(fft_vals[(freqs >= 13) & (freqs < 32)]) ** 2)
+
+        bands = {'delta': float(delta_band), 'theta': float(theta_band), 'alpha': float(alpha_band), 'beta': float(beta_band)}
+        new_row = pd.DataFrame([bands])
+
+        fft_df = pd.concat([fft_df, new_row], ignore_index=True)
+    
     path = os.path.join(folder_name, "processed.csv")
     fft_df.to_csv(path, index=False)
 
