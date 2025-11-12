@@ -11,7 +11,7 @@ import matplotlib
 [ ] split data based on wave frequency
 [ ] put each frequency into separate data structure
 [ ] run preliminary tests on each frequency, checking for min, max, and variance
-[ ] create alternative output format that is human readable (ex: table)
+[x] create alternative output format that is human readable (ex: table)
 [ ] output data structures in desired output format
 """
 
@@ -60,7 +60,7 @@ def main():
         print(f"file does not exist at: {file_path}")
         return
 
-    # prints first five rows of readings, split by channel
+    # prints first five rows of readings, split by channel; sanity check
     df = pd.read_csv(file_path)
     df_channels = df[["ch1", "ch2", "ch3", "ch4"]]
     print(tabulate(df_channels.head(), headers='keys', tablefmt='grid', showindex=False))

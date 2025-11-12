@@ -2,8 +2,11 @@
 
 ## Getting Started
 
-### Installing and Adding Dependencies
+### Using Pipenv for Dependencies
 
--   install existing dependencies using `pip install -r requirements.txt`
--   add any additional dependencies as needed
--   if new dependencies were added, save them to the requirements file with `pipreqs .`
+-   install pipenv with `python -m pip install --user pipenv` (Windows) or `brew install pipenv` (Mac)
+-   go to project folder and create virtual environment with `pipenv install`
+-   to go inside the virtual environment, use `pipenv shell`
+-   to add new dependencies, use `pipenv install ___`
+-   to exit pipenv shell, type `exit`
+-   to run commands outside the pipenv shell, use `pipenv run python ___.py`
