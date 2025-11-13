@@ -30,7 +30,7 @@ Notes:
 """
 
 # global variables - check compatibility of \ and / between windows and mac
-folder_name = os.path.abspath("../data")
+folder_name = os.path.abspath(os.path.join("..", "data"))
 
 def get_data(file_name):
     """
@@ -72,10 +72,18 @@ def transform_to_hz(data):
         alpha_band = np.sum(abs(fft_vals[(freqs >= 8) & (freqs < 13)]) ** 2)
         beta_band = np.sum(abs(fft_vals[(freqs >= 13) & (freqs < 32)]) ** 2)
 
-        bands = {'delta': float(delta_band), 'theta': float(theta_band), 'alpha': float(alpha_band), 'beta': float(beta_band)}
-        new_row = pd.DataFrame([bands])
+        new_row = pd.DataFrame([{
+            'delta': float(delta_band), 
+            'theta': float(theta_band), 
+            'alpha': float(alpha_band), 
+            'beta': float(beta_band)}], 
+            columns=columns)
 
-        fft_df = pd.concat([fft_df, new_row], ignore_index=True)
+        # initialize DataFrame if empty, otherwise concatenate
+        if fft_df.empty:
+            fft_df = new_row
+        elif not new_row.empty and not new_row.isna().all().all():
+            fft_df = pd.concat([fft_df, new_row], ignore_index=True)
     
     path = os.path.join(folder_name, "processed.csv")
     fft_df.to_csv(path, index=False)
