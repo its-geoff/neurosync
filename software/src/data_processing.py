@@ -10,7 +10,8 @@ import matplotlib
 [x] print data from four channels and combine data
 [x] convert from mV to Hz
 [x] calculate band power and add to new df
-[ ] run preliminary tests on each power, checking for min, max, and variance
+[x] normalize band power
+[ ] add function for stats tests on each band, checking for min, max, variance, etc.
 [x] create alternative output format that is human readable (ex: table)
 [ ] output data structures in desired output format
 
@@ -22,14 +23,12 @@ Theta - 4-8 Hz
 Delta - 0.5-4 Hz
 
 Notes:
-    - keep rows intact to show emotional state at a point in time
-    - channels do matter; frontal channels more important in emotional detection
-    - don't remove or combine channels arbitrarily
-
-    * double check if band power is correct; not sure if we should be seeing powers >2^5
+    - identify frequency of band powers in relation to total -> is this a way we can identify emotions?
+    - make function to do stats tests on each band
+    - compare this to control (neutral) brainwaves and other distinct emotional brainwaves (use existing dataset)
 """
 
-# global variables - check compatibility of \ and / between windows and mac
+# global variables
 folder_name = os.path.abspath(os.path.join("..", "data"))
 
 def get_data(file_name):
@@ -47,13 +46,13 @@ def get_data(file_name):
 
 def transform_to_hz(data):
     """
-    Converts EEG input in mV to frequency in Hz.
+    Converts EEG output in mV to frequency in Hz.
 
     Arguments:
         data (pandas DataFrame): The CSV file data in mV to be converted to Hz.
     
     Returns:
-
+        DataFrame: The output set of normalized frequencies after an FFT.
     """
     window_size = 256                                   # sampling rate of Muse 2 headband
     step_size = 128                                     # 50% overlap between windows
@@ -63,7 +62,7 @@ def transform_to_hz(data):
     # FFT for all channels
     for start in range(0, len(data) - window_size, step_size):
         window = data[start:start + window_size]
-        fft_vals = fft(window, axis=0)
+        fft_vals = fft(window, axis=0) / window_size        # normalize by dividing by window size
         freqs = fftfreq(window_size, 1 / window_size)
     
         # compute bands; square for band power
@@ -89,6 +88,18 @@ def transform_to_hz(data):
     fft_df.to_csv(path, index=False)
 
     return fft_df
+
+def get_stats(data):
+    """
+    Gets measures of central tendency and measures of dispersion for a set of data.
+
+    Arguments:
+        data (pandas DataFrame): The post-FFT data in Hz to be analyzed.
+    
+    Returns:
+        None.
+    """
+    
 
 def main():
     # change to get_data(file) later with file being an arg in main
