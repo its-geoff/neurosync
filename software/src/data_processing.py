@@ -99,7 +99,28 @@ def get_stats(data):
     Returns:
         None.
     """
+    # measures of central tendency
+    mean = data.mean()
+    median = data.median()
+    mode = data.mode()
+
+    # measures of dispersion
+    rnge = data.max() - data.min()
+    variance = data.var()
+    std_dev = data.std()
+    iqr = data.quantile(0.75) - data.quantile(0.25)
     
+
+    # output
+    print("\n--- Measures of Central Tendency ---\n")
+    print(f"Column means:\n{mean.to_string()}\n")
+    print(f"Column medians:\n{median.to_string()}\n")
+    print(f"Column modes:\n{mode.to_string()}\n")
+    print("\n--- Measures of Dispersion ---\n")
+    print(f"Column ranges:\n{rnge.to_string()}\n")
+    print(f"Column variance:\n{variance.to_string()}\n")
+    print(f"Column standard deviation:\n{std_dev.to_string()}\n")
+    print(f"Column interquartile range:\n{iqr.to_string()}\n")
 
 def main():
     # change to get_data(file) later with file being an arg in main
@@ -114,9 +135,10 @@ def main():
     df = pd.read_csv(file_path)  # CSV reading to pandas DataFrame
     df_channels = df[["ch1", "ch2", "ch3", "ch4"]]
     print(tabulate(df_channels.head(), headers='keys', tablefmt='grid', showindex=False))
-    transform_to_hz(df_channels)
+    data = transform_to_hz(df_channels)
 
-    print(tabulate(transform_to_hz(df_channels).head(), headers='keys', tablefmt='grid', showindex=False))
+    print(tabulate(data.head(), headers='keys', tablefmt='grid', showindex=False))
+    get_stats(data.head())
 
 if __name__ == '__main__':
     main()
