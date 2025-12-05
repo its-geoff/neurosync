@@ -11,7 +11,7 @@ import matplotlib
 [x] convert from mV to Hz
 [x] calculate band power and add to new df
 [x] normalize band power
-[ ] add function for stats tests on each band, checking for min, max, variance, etc.
+[x] add function for stats tests on each band, checking for min, max, variance, etc.
 [x] create alternative output format that is human readable (ex: table)
 [ ] output data structures in desired output format
 
@@ -24,8 +24,8 @@ Delta - 0.5-4 Hz
 
 Notes:
     - identify frequency of band powers in relation to total -> is this a way we can identify emotions?
-    - make function to do stats tests on each band
     - compare this to control (neutral) brainwaves and other distinct emotional brainwaves (use existing dataset)
+    - figure out conversion to UART (8 bit individual integers)
 """
 
 # global variables
@@ -138,7 +138,7 @@ def main():
     data = transform_to_hz(df_channels)
 
     print(tabulate(data.head(), headers='keys', tablefmt='grid', showindex=False))
-    get_stats(data.head())
+    get_stats(data)
 
 if __name__ == '__main__':
     main()
