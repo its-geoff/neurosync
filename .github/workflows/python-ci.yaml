@@ -42,17 +42,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pipenv install --deploy --ignore-pipfile
-
-    - name: Run dependency security check
-      run: |
-        pip install safety
-        pipenv run safety check --file=Pipfile.lock
-
-    - name: Code security scan (Bandit)
-      run: |
-        pip install bandit
-        pipenv run bandit -r . -lll   # fail only on medium or high -x .venv,venv,build,dist,.git
+        pipenv install --deploy --ignore-pipfile --dev
 
     - name: Check formatting
       run: pipenv run black --check . --exclude "/(\.venv|\.git|__pycache__)/"
@@ -67,34 +57,6 @@ jobs:
     - name: Lint code
       run: pipenv run flake8 --max-line-length=79 .
 
-  lint:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.13
-
-      - name: Install pipenv
-        run: pip install --upgrade pip pipenv
-
-      - name: Install dependencies
-        run: |
-          pipenv install --deploy --ignore-pipfile
-
-      - name: Check formatting
-        run: pipenv run black --check .
-
-      - name: Check import sorting
-        run: pipenv run isort --check-only .
-
-      - name: Lint code
-        run: pipenv run flake8 .
-
   security:
     runs-on: ubuntu-latest
     permissions:
@@ -103,7 +65,7 @@ jobs:
       security-events: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -115,16 +77,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pipenv install --deploy --ignore-pipfile
+          pipenv install --deploy --ignore-pipfile --dev
 
       - name: Run dependency security check (Safety)
         run: |
-          pip install safety
           pipenv run safety check --file=Pipfile.lock
 
       - name: Run code security scan (Bandit)
         run: |
-          pip install bandit
           pipenv run bandit -r . -lll -x .venv,venv,build,dist,.git  # fail only on medium or high
 
       - name: Initialize CodeQL
