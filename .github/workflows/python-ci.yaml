@@ -67,16 +67,67 @@ jobs:
     - name: Lint code
       run: pipenv run flake8 .
 
-  security-scan:
+  lint:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.13
+
+      - name: Install pipenv
+        run: pip install --upgrade pip pipenv
+
+      - name: Install dependencies
+        run: |
+          pipenv install --deploy --ignore-pipfile
+
+      - name: Check formatting
+        run: pipenv run black --check .
+
+      - name: Check import sorting
+        run: pipenv run isort --check-only .
+
+      - name: Lint code
+        run: pipenv run flake8 .
+
+  security:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
-      security-events: write   # required by CodeQL
+      security-events: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.13
+
+      - name: Install pipenv
+        run: pip install --upgrade pip pipenv
+
+      - name: Install dependencies
+        run: |
+          pipenv install --deploy --ignore-pipfile
+
+      - name: Run dependency security check (Safety)
+        run: |
+          pip install safety
+          pipenv lock --requirements > requirements.txt
+          safety check -r requirements.txt
+
+      - name: Run code security scan (Bandit)
+        run: |
+          pip install bandit
+          pipenv run bandit -r .
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
