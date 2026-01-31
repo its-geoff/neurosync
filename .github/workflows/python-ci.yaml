@@ -51,6 +51,7 @@ jobs:
 
     - name: Code security scan (Bandit)
       run: |
+        pip install bandit
         pipenv run bandit -r . -x .venv,venv,build,dist,.git
 
     - name: Check formatting
