@@ -5,29 +5,6 @@ from tabulate import tabulate
 from scipy.fft import fft, fftfreq
 import matplotlib
 
-"""
-[x] extract data from csv
-[x] print data from four channels and combine data
-[x] convert from mV to Hz
-[x] calculate band power and add to new df
-[x] normalize band power
-[x] add function for stats tests on each band, checking for min, max, variance, etc.
-[x] create alternative output format that is human readable (ex: table)
-[ ] output data structures in desired output format
-
-Gamma - >32 Hz (Not needed for emotions; filter out)
-----------------
-Beta - 13-32 Hz
-Alpha - 8-13 Hz
-Theta - 4-8 Hz
-Delta - 0.5-4 Hz
-
-Notes:
-    - identify frequency of band powers in relation to total -> is this a way we can identify emotions?
-    - compare this to control (neutral) brainwaves and other distinct emotional brainwaves (use existing dataset)
-    - figure out conversion to UART (8 bit individual integers)
-"""
-
 # global variables
 folder_name = os.path.abspath(os.path.join("..", "data"))
 
