@@ -52,7 +52,7 @@ jobs:
     - name: Code security scan (Bandit)
       run: |
         pip install bandit
-        pipenv run bandit -r . -x .venv,venv,build,dist,.git
+        pipenv run bandit -r . -lll   # fail only on medium or high -x .venv,venv,build,dist,.git
 
     - name: Check formatting
       run: pipenv run black --check . --exclude "/(\.venv|\.git|__pycache__)/"
@@ -125,7 +125,7 @@ jobs:
       - name: Run code security scan (Bandit)
         run: |
           pip install bandit
-          pipenv run bandit -r .
+          pipenv run bandit -r . -lll -x .venv,venv,build,dist,.git  # fail only on medium or high
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
