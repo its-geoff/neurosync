@@ -96,7 +96,6 @@ jobs:
         run: pipenv run flake8 .
 
   security:
-    name: CodeQL Analysis
     runs-on: ubuntu-latest
     permissions:
       actions: read
