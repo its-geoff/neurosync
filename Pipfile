@@ -10,13 +10,13 @@ scipy = "*"
 tabulate = "*"
 pylsl = "*"
 matplotlib = "*"
-pathlib = "*"
-argparse = "*"
+
+[dev-packages]
 flake8 = "*"
 black = "*"
 isort = "*"
-
-[dev-packages]
+safety = "*"
+bandit = "*"
 
 [requires]
 python_version = "3.13"

@@ -22,7 +22,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -47,25 +47,24 @@ jobs:
     - name: Run dependency security check
       run: |
         pip install safety
-        pipenv lock -r > requirements.txt
-        safety check -r requirements.txt
+        pipenv run safety check --file=Pipfile.lock
 
     - name: Code security scan (Bandit)
       run: |
-        pip install bandit
-        pipenv run bandit -r .
+        pipenv run bandit -r . -x .venv,venv,build,dist,.git
 
     - name: Check formatting
-      run: pipenv run black --check .
+      run: pipenv run black --check . --exclude "/(\.venv|\.git|__pycache__)/"
 
     - name: Check import sorting
-      run: pipenv run isort --check-only .
+      run: pipenv run isort --check-only . --skip .venv --skip .git --skip __pycache__
 
-    - name: Run tests
-      run: pipenv run pytest -v
+    # no tests added yet
+    # - name: Run tests
+    #   run: pipenv run pytest -v
 
     - name: Lint code
-      run: pipenv run flake8 .
+      run: pipenv run flake8 --max-line-length=79 .
 
   lint:
     needs: test
@@ -120,8 +119,7 @@ jobs:
       - name: Run dependency security check (Safety)
         run: |
           pip install safety
-          pipenv lock --requirements > requirements.txt
-          safety check -r requirements.txt
+          pipenv run safety check --file=Pipfile.lock
 
       - name: Run code security scan (Bandit)
         run: |

@@ -15,7 +15,7 @@ def get_data(file_name):
     Returns:
         String: The platform-specific path to the file.
     """
-    folder_name = os.path.abspath("..\data")
+    folder_name = os.path.abspath(os.path.join("..", "data"))
     return os.path.join(folder_name, file_name)
 
 
