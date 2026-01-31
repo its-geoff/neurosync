@@ -3,8 +3,8 @@ import time
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
+import pandas as pd
 from scipy.signal import welch
 
 CSV_FILE = Path("muse2_eeg_data.csv")

@@ -1,6 +1,7 @@
+import csv
 import subprocess
 import time
-import csv
+
 from pylsl import StreamInlet, resolve_byprop
 
 # ---------- CONFIG ----------

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "895bfc8474240bfa946a987b24feec29b3d1aa7f288fed7354b8b1c8e4228b2e"
+            "sha256": "4e414d89c85fdf47d76a1d9df0f0661dcce663f1f5292c4f112baf4c7e709eb3"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,14 +16,6 @@
         ]
     },
     "default": {
-        "argparse": {
-            "hashes": [
-                "sha256:62b089a55be1d8949cd2bc7e0df0bddb9e028faefc8c32038cc84862aefdd6e4",
-                "sha256:c31647edb69fd3d465a847ea3157d37bed1f95f19760b11a47aa91c04b666314"
-            ],
-            "index": "pypi",
-            "version": "==1.4.0"
-        },
         "contourpy": {
             "hashes": [
                 "sha256:023b44101dfe49d7d53932be418477dba359649246075c996866106da069af69",
@@ -476,14 +468,6 @@
             "index": "pypi",
             "markers": "python_version >= '3.11'",
             "version": "==3.0.0"
-        },
-        "pathlib": {
-            "hashes": [
-                "sha256:6940718dfc3eff4258203ad5021090933e5c04707d5ca8cc9e73c94a7894ea9f",
-                "sha256:f35f95ab8b0f59e6d354090350b44a80a80635d22efdedfa84c7ad1cf0a74147"
-            ],
-            "index": "pypi",
-            "version": "==1.0.1"
         },
         "pillow": {
             "hashes": [
