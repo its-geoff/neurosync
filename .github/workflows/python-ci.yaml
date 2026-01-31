@@ -1,0 +1,98 @@
+name: Python CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+
+  pull_request:
+    branches: [ "main" ]
+    types: [ opened, synchronize ]
+    
+  schedule:
+    - cron: '0 8 * * 1'   # weekly on Mondays at 8:00am UTC (12:00am PST / 1:00am PDT)
+
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.13]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pipenv
+      uses: actions/cache@v4
+      with:
+        path: ~/.local/share/virtualenvs
+        key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pipenv-
+
+    - name: Install pipenv
+      run: pip install --upgrade pip pipenv
+
+    - name: Install dependencies
+      run: |
+        pipenv install --deploy --ignore-pipfile --dev
+
+    - name: Check formatting
+      run: pipenv run black --check . --exclude "/(\.venv|\.git|__pycache__)/"
+
+    - name: Check import sorting
+      run: pipenv run isort --check-only . --skip .venv --skip .git --skip __pycache__
+
+    # no tests added yet
+    # - name: Run tests
+    #   run: pipenv run pytest -v
+
+    - name: Lint code
+      run: pipenv run flake8 .
+
+  security:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+
+      - name: Install pipenv
+        run: pip install --upgrade pip pipenv
+
+      - name: Install dependencies
+        run: |
+          pipenv install --deploy --ignore-pipfile --dev
+
+      - name: Run dependency security check (Safety)
+        env:
+          SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
+        run: |
+          pipenv run safety scan
+
+      - name: Run code security scan (Bandit)
+        run: |
+          pipenv run bandit -r . -lll -x .venv,venv,build,dist,.git  # fail only on medium or high
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4

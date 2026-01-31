@@ -1,4 +1,12 @@
 {
-    "python-envs.defaultEnvManager": "ms-python.python:venv",
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.python"
+    },
+
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "always"
+    },
+    "python-envs.defaultEnvManager": "ms-python.python:pipenv",
     "python-envs.pythonProjects": []
 }

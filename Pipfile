@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "*"
+pandas = "*"
+scipy = "*"
+tabulate = "*"
+pylsl = "*"
+matplotlib = "*"
+
+[dev-packages]
+flake8 = "*"
+black = "*"
+isort = "*"
+safety = "*"
+bandit = "*"
+
+[requires]
+python_version = "3.13"
