@@ -79,6 +79,9 @@ jobs:
         run: |
           pipenv install --deploy --ignore-pipfile --dev
 
+      - name: Configure Safety API key
+        run: pipenv run safety login --key ${{ secrets.SAFETY_API_KEY }}
+
       - name: Run dependency security check (Safety)
         run: |
           pipenv run safety scan

@@ -1,2 +1,3 @@
+-i https://pkgs.safetycli.com/repository/none-6bc20/project/neurosync/pypi/simple/
 muselsl==2.3.1
 pipreqs==0.4.13
