@@ -3,8 +3,14 @@ name: Python CI/CD
 on:
   push:
     branches: [ "main" ]
+
   pull_request:
     branches: [ "main" ]
+    types: [ opened, synchronize ]
+    
+  schedule:
+    - cron: '0 8 * * *'
+
   workflow_dispatch:
 
 jobs:
@@ -23,6 +29,14 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Cache pipenv
+      uses: actions/cache@v3
+      with:
+        path: ~/.local/share/virtualenvs
+        key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pipenv-
+
     - name: Install pipenv
       run: pip install --upgrade pip pipenv
 
@@ -30,8 +44,49 @@ jobs:
       run: |
         pipenv install --deploy --ignore-pipfile
 
+    - name: Run dependency security check
+      run: |
+        pip install safety
+        pipenv lock --requirements > requirements.txt
+        safety check -r requirements.txt
+
+    - name: Code security scan (Bandit)
+      run: |
+        pip install bandit
+        pipenv run bandit -r .
+
+    - name: Check formatting
+      run: pipenv run black --check .
+
+    - name: Check import sorting
+      run: pipenv run isort --check-only .
+
     - name: Run tests
       run: pipenv run pytest -v
 
     - name: Lint code
       run: pipenv run flake8 .
+
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write   # required by CodeQL
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
+
+      - name: Autobuild
+        run: |
+          pip install --upgrade pip pipenv
+          pipenv install --deploy --ignore-pipfile
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
