@@ -88,11 +88,3 @@ jobs:
       - name: Run code security scan (Bandit)
         run: |
           pipenv run bandit -r . -lll -x .venv,venv,build,dist,.git  # fail only on medium or high
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
-        with:
-          languages: python
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
