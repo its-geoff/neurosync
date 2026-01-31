@@ -47,7 +47,7 @@ jobs:
     - name: Run dependency security check
       run: |
         pip install safety
-        pipenv lock --requirements > requirements.txt
+        pipenv lock -r > requirements.txt
         safety check -r requirements.txt
 
     - name: Code security scan (Bandit)
