@@ -33,8 +33,6 @@ jobs:
         uses: github/codeql-action/init@v4
         with:
           languages: python
-          # Optional: use a custom config file for queries
-          config-file: .github/codeql/codeql-python-config.yml
 
       - name: Create CodeQL database for Python
         run: |
