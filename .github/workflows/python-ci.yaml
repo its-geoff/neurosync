@@ -9,7 +9,7 @@ on:
     types: [ opened, synchronize ]
     
   schedule:
-    - cron: '0 8 * * 1'   # weekly on Mondays at 8:00am UTC (12:00am PST)
+    - cron: '0 8 * * 1'   # weekly on Mondays at 8:00am UTC (12:00am PST / 1:00am PDT)
 
   workflow_dispatch:
 
