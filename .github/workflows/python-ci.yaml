@@ -55,7 +55,7 @@ jobs:
     #   run: pipenv run pytest -v
 
     - name: Lint code
-      run: pipenv run flake8 --max-line-length=79 .
+      run: pipenv run flake8 .
 
   security:
     runs-on: ubuntu-latest
@@ -68,7 +68,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.13
 
