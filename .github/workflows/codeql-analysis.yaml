@@ -2,10 +2,11 @@ name: Python CodeQL Analysis
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
+
   pull_request:
-    branches: [ "main" ]
-    types: [opened, synchronize]
+    branches: [ main ]
+    types: [ opened, synchronize ]
 
 jobs:
   security-scan:
