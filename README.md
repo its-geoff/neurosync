@@ -1,12 +1,8 @@
-# neurosync
+# NeuroSync
 
-## Getting Started
+## Description
 
-### Using Pipenv for Dependencies
-
--   install pipenv with `python -m pip install --user pipenv` (Windows) or `brew install pipenv` (Mac)
--   go to project folder and create virtual environment with `pipenv install`
--   to go inside the virtual environment, use `pipenv shell`
--   to add new dependencies, use `pipenv install ___`
--   to exit pipenv shell, type `exit`
--   to run commands outside the pipenv shell, use `pipenv run python ___.py`
+NeuroSync is a project that uses an EEG headband with connected software to
+filter brainwaves and translate them to emotions. This project has applications
+in mental health counseling, improving counselors' grasp of their client's
+emotions.

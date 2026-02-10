@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -e  # exit on first error
+
+echo "Formatting code..."
+uv run --quiet black .
+uv run --quiet isort .
+
+echo "Formatting docstrings..."
+find src -name "*.py" -exec uv run --quiet docformatter --wrap-summaries 79 --wrap-descriptions 79 --in-place {} +
+
+echo "Linting..."
+uv run --quiet flake8 src/
+
+echo "All checks passed."
