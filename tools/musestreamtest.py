@@ -25,7 +25,8 @@ def connect_to_stream(stream_type="EEG", timeout=5):
     print(f"[INFO] Waiting {STREAM_START_DELAY}s for stream to initialize...")
     time.sleep(STREAM_START_DELAY)
     print(f"[INFO] Looking for {stream_type} stream (timeout={timeout}s)...")
-    # resolve_byprop(prop, value, timeout) is the pylsl helper to find streams by property
+    # resolve_byprop(prop, value, timeout) is the pylsl helper to find streams
+    # by property
     streams = resolve_byprop("type", stream_type, timeout=timeout)
     if not streams:
         raise RuntimeError(f"No LSL stream found with type='{stream_type}'")
@@ -55,14 +56,14 @@ def collect_and_save(inlet):
 
 
 def main():
-    # 1️⃣ Start Muse LSL streaming process
+    # Start Muse LSL streaming process
     muse_proc = start_muse_stream()
 
     try:
-        # 2️⃣ Connect to EEG LSL stream
+        # Connect to EEG LSL stream
         inlet = connect_to_stream()
 
-        # 3️⃣ Collect and save EEG samples
+        # Collect and save EEG samples
         collect_and_save(inlet)
 
     finally:

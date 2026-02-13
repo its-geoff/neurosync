@@ -35,11 +35,9 @@ url = "https://pypi.org/simple"
 
 [tool.black]
 line-length = 79
+target-version = ["py313"]
 
 [tool.flake8]
 max-line-length = 79
 exclude = [".venv"]
 extend-ignore = ["E203", "W503"]
-[tool.black]
-line-length = 79
-target-version = ["py313"]
