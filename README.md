@@ -1,9 +1,8 @@
-# neurosync
+# NeuroSync
 
-## Getting Started
+## Description
 
-### Installing and Adding Dependencies
-
--   install existing dependencies using `pip install -r requirements.txt`
--   add any additional dependencies as needed
--   if new dependencies were added, save them to the requirements file with `pipreqs .`
+NeuroSync is a project that uses an EEG headband with connected software to
+filter brainwaves and translate them to emotions. This project has applications
+in mental health counseling, improving counselors' grasp of their client's
+emotions.

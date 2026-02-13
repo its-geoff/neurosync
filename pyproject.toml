@@ -1,3 +1,43 @@
+[project]
+name = "NeuroSync"
+version = "0.0.1"
+requires-python = "~=3.13"
+dependencies = [
+    "numpy",
+    "pandas",
+    "scipy",
+    "tabulate",
+    "pylsl",
+    "matplotlib",
+]
+
+[dependency-groups]
+dev = [
+    "bandit>=1.9.3",
+    "black>=26.1.0",
+    "docformatter>=1.7.7",
+    "flake8>=7.3.0",
+    "flake8-pyproject>=1.2.4",
+    "isort>=7.0.0",
+    "safety>=3.7.0",
+]
+
+[tool.uv]
+package = false
+
+[[tool.uv.index]]
+url = "https://pkgs.safetycli.com/repository/public/pypi/simple/"
+default = true
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+
 [tool.black]
 line-length = 79
 target-version = ["py313"]
+
+[tool.flake8]
+max-line-length = 79
+exclude = [".venv"]
+extend-ignore = ["E203", "W503"]
