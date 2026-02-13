@@ -24,7 +24,7 @@ def get_data(file_name):
 
 
 def transform_to_hz(data):
-    """Converts EEG output in mV to frequency in Hz.
+    """Converts EEG band power features from time domain samples using FFT.
 
     Arguments:
         data (pandas DataFrame): The CSV file data in mV to be converted to Hz.
@@ -38,7 +38,7 @@ def transform_to_hz(data):
     fft_df = pd.DataFrame(columns=columns)  # define FFT DataFrame
 
     # FFT for all channels
-    for start in range(0, len(data) - window_size, step_size):
+    for start in range(0, len(data) - window_size + 1, step_size):
         window = data[start : start + window_size]
         fft_vals = (
             fft(window, axis=0) / window_size
