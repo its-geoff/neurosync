@@ -9,7 +9,7 @@ on:
     types: [ opened, synchronize ]
 
 jobs:
-  security-scan:
+  analyze:
     runs-on: ubuntu-latest
     permissions:
       actions: read
