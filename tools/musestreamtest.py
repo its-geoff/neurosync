@@ -56,14 +56,14 @@ def collect_and_save(inlet):
 
 
 def main():
-    # 1️⃣ Start Muse LSL streaming process
+    # Start Muse LSL streaming process
     muse_proc = start_muse_stream()
 
     try:
-        # 2️⃣ Connect to EEG LSL stream
+        # Connect to EEG LSL stream
         inlet = connect_to_stream()
 
-        # 3️⃣ Collect and save EEG samples
+        # Collect and save EEG samples
         collect_and_save(inlet)
 
     finally:
