@@ -1,10 +1,10 @@
 import os
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import pytest
-import data_processing  # file being tested
 
+import data_processing  # file being tested
 
 # global variables
 folder_name = os.path.abspath(os.path.join("..", "data"))
@@ -14,16 +14,28 @@ folder_name = os.path.abspath(os.path.join("..", "data"))
 def sample_eeg_data():
     """
     Fixture providing sample EEG data.
-    
+
     Returns a DataFrame with sample EEG frequency bands for testing statistical
     analysis functions.
     """
-    return pd.DataFrame({
-        'delta_Hz': [1.5, 2.0, 1.8, 2.2, 1.9, 2.1, 1.7, 2.0, 1.8, 2.0],
-        'theta_Hz': [5.5, 6.0, 5.8, 6.2, 5.9, 6.1, 5.7, 6.0, 5.8, 6.0],
-        'alpha_Hz': [10.5, 11.0, 10.8, 11.2, 10.9, 11.1, 10.7, 11.0, 10.8,
-                     11.0]
-    })
+    return pd.DataFrame(
+        {
+            "delta_Hz": [1.5, 2.0, 1.8, 2.2, 1.9, 2.1, 1.7, 2.0, 1.8, 2.0],
+            "theta_Hz": [5.5, 6.0, 5.8, 6.2, 5.9, 6.1, 5.7, 6.0, 5.8, 6.0],
+            "alpha_Hz": [
+                10.5,
+                11.0,
+                10.8,
+                11.2,
+                10.9,
+                11.1,
+                10.7,
+                11.0,
+                10.8,
+                11.0,
+            ],
+        }
+    )
 
 
 def test_get_data():
@@ -89,9 +101,7 @@ def test_get_stats_mean_values(capsys):
     """
     Test that get_stats calculates and prints correct mean values.
     """
-    df = pd.DataFrame({
-        'alpha_Hz': [5.0, 7.5, 10.0]
-    })
+    df = pd.DataFrame({"alpha_Hz": [5.0, 7.5, 10.0]})
 
     data_processing.get_stats(df)
 
@@ -105,9 +115,7 @@ def test_get_stats_median_values(capsys):
     """
     Test that get_stats calculates and prints correct median values.
     """
-    df = pd.DataFrame({
-        'alpha_Hz': [3, 8, 1, 7, 3, 9, 2]
-    })
+    df = pd.DataFrame({"alpha_Hz": [3, 8, 1, 7, 3, 9, 2]})
 
     data_processing.get_stats(df)
 
@@ -121,9 +129,7 @@ def test_get_stats_mode_values(capsys):
     """
     Test that get_stats calculates and prints correct mode values.
     """
-    df = pd.DataFrame({
-        'alpha_Hz': [1, 2, 1, 1, 1, 1, 6, 2, 9, 7, 2]
-    })
+    df = pd.DataFrame({"alpha_Hz": [1, 2, 1, 1, 1, 1, 6, 2, 9, 7, 2]})
 
     data_processing.get_stats(df)
 
@@ -137,9 +143,7 @@ def test_get_stats_range_values(capsys):
     """
     Test that get_stats calculates and prints correct range values.
     """
-    df = pd.DataFrame({
-        'alpha_Hz': [20.0, 17.5, 19.5, 15.0, 9.5]
-    })
+    df = pd.DataFrame({"alpha_Hz": [20.0, 17.5, 19.5, 15.0, 9.5]})
 
     data_processing.get_stats(df)
 
@@ -153,9 +157,7 @@ def test_get_stats_variance_values(capsys):
     """
     Test that get_stats calculates and prints correct variance values.
     """
-    df = pd.DataFrame({
-        'alpha_Hz': [2, 4, 4, 4, 9, 5, 7, 5]
-    })
+    df = pd.DataFrame({"alpha_Hz": [2, 4, 4, 4, 9, 5, 7, 5]})
 
     data_processing.get_stats(df)
 
@@ -170,9 +172,7 @@ def test_get_stats_std_dev_values(capsys):
     Test that get_stats calculates and prints correct standard deviation
     values.
     """
-    df = pd.DataFrame({
-        'alpha_Hz': [1, 3, 5, 7]
-    })
+    df = pd.DataFrame({"alpha_Hz": [1, 3, 5, 7]})
 
     data_processing.get_stats(df)
 
@@ -187,9 +187,7 @@ def test_get_stats_iqr_values(capsys):
     Test that get_stats calculates and prints correct interquartile range
     values.
     """
-    df = pd.DataFrame({
-        'alpha_Hz': [3, 4, 9, 11, 15, 14, 16]
-    })
+    df = pd.DataFrame({"alpha_Hz": [3, 4, 9, 11, 15, 14, 16]})
 
     data_processing.get_stats(df)
 

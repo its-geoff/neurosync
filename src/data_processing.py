@@ -10,8 +10,7 @@ folder_name = os.path.abspath(os.path.join("..", "data"))
 
 
 def get_data(file_name):
-    """
-    Extracts file from data folder for processing. Ensures compatibility
+    """Extracts file from data folder for processing. Ensures compatibility
     across platforms.
 
     Arguments:
@@ -25,8 +24,7 @@ def get_data(file_name):
 
 
 def transform_to_hz(data):
-    """
-    Converts EEG band power features from time domain samples using FFT.
+    """Converts EEG band power features from time domain samples using FFT.
 
     Arguments:
         data (pandas DataFrame): The CSV file data in mV to be converted to Hz.
@@ -78,8 +76,7 @@ def transform_to_hz(data):
 
 
 def get_stats(data):
-    """
-    Gets measures of central tendency and measures of dispersion for a set
+    """Gets measures of central tendency and measures of dispersion for a set
     of data.
 
     Arguments:
@@ -137,12 +134,24 @@ def main():
     print(
         tabulate(data.head(), headers="keys", tablefmt="grid", showindex=False)
     )
-    test_df = pd.DataFrame({
-        'delta_Hz': [1.5, 2.0, 1.8, 2.2, 1.9, 2.1, 1.7, 2.0, 1.8, 2.0],
-        'theta_Hz': [5.5, 6.0, 5.8, 6.2, 5.9, 6.1, 5.7, 6.0, 5.8, 6.0],
-        'alpha_Hz': [10.5, 11.0, 10.8, 11.2, 10.9, 11.1, 10.7, 11.0, 10.8, 
-                     11.0]
-    })
+    test_df = pd.DataFrame(
+        {
+            "delta_Hz": [1.5, 2.0, 1.8, 2.2, 1.9, 2.1, 1.7, 2.0, 1.8, 2.0],
+            "theta_Hz": [5.5, 6.0, 5.8, 6.2, 5.9, 6.1, 5.7, 6.0, 5.8, 6.0],
+            "alpha_Hz": [
+                10.5,
+                11.0,
+                10.8,
+                11.2,
+                10.9,
+                11.1,
+                10.7,
+                11.0,
+                10.8,
+                11.0,
+            ],
+        }
+    )
     get_stats(test_df)
 
 
