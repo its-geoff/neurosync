@@ -1,8 +1,0 @@
-LICENSE
-README.md
-pyproject.toml
-src/NeuroSync.egg-info/PKG-INFO
-src/NeuroSync.egg-info/SOURCES.txt
-src/NeuroSync.egg-info/dependency_links.txt
-src/NeuroSync.egg-info/requires.txt
-src/NeuroSync.egg-info/top_level.txt
