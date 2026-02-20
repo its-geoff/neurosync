@@ -108,7 +108,7 @@ def get_stats(data):
     print(f"Column interquartile range:\n{iqr.to_string()}\n")
 
 
-def main():
+def run():
     # change to get_data(file) later with file being an arg in main
     file_path = get_data("muse2_eeg_data.csv")
     # path to data file
@@ -156,4 +156,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run()
