@@ -1,2 +1,22 @@
-.venv
+# IDE settings
+.vscode
+
+# virtual environment
+.venv/
+venv/
+env/
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# package metadata
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# processed data
 data/processed.csv

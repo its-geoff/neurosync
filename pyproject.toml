@@ -9,6 +9,7 @@ dependencies = [
     "tabulate",
     "pylsl",
     "matplotlib",
+    "serial>=0.0.97",
 ]
 
 [dependency-groups]
