@@ -1,3 +1,13 @@
+"""
+data_processing.py
+
+Processes raw EEG data collected from the Muse 2 headband for the NeuroSync
+project. Reads multi-channel CSV recordings, applies a Short-Time Fourier
+Transform (STFT) with a 256-sample windowed FFT to extract delta, theta,
+alpha, and beta band power features, and outputs a processed CSV for
+classification.
+"""
+
 import os
 
 import numpy as np
