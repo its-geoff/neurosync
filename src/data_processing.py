@@ -83,7 +83,7 @@ def save_processed_data(data: pd.DataFrame) -> None:
     """
     path = os.path.join(folder_name, "processed.csv")
     header = not os.path.exists(path)  # write header only on first write
-    data.to_csv(path, mode='a', index=False, header=header)
+    data.to_csv(path, mode="a", index=False, header=header)
 
 
 def get_stats(data: pd.DataFrame) -> None:
