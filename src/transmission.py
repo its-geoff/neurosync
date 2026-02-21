@@ -12,6 +12,9 @@ import serial
 
 # global variables
 crc8 = crcmod.predefined.mkCrcFun("crc-8")
+SYNC_BYTE_1 = 0xAA
+SYNC_BYTE_2 = 0x55
+PAYLOAD_LENGTH = 8  # 4 bands * 2 bytes each
 
 
 def validate_packet(packet: bytes) -> bool:
@@ -38,14 +41,16 @@ def df_to_packet(row: dict) -> bytes:
 
     Returns:
         bytes: A set of bytes in the form of a UART packet.
-            Format: [delta(f32)][theta(f32)][alpha(f32)][beta(f32)][crc8]
+            [header][delta(u16)][theta(u16)][alpha(u16)][beta(u16)][crc8]
     """
+    # define header, payload, and checksum
+    header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
     payload = struct.pack(
-        "ffff", row["delta"], row["theta"], row["alpha"], row["beta"]
+        "HHHH", row["delta"], row["theta"], row["alpha"], row["beta"]
     )
     checksum = crc8(payload)
 
-    return payload + bytes([checksum])
+    return header + payload + bytes([checksum])
 
 
 def packet_to_df(ser: serial.Serial) -> dict | None:
@@ -57,7 +62,7 @@ def packet_to_df(ser: serial.Serial) -> dict | None:
     Returns:
         dict: A dict of EEG band power values.
     """
-    packet_size = 17
+    packet_size = 12
     packet = ser.read(packet_size)
 
     # validate checksum

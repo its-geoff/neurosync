@@ -6,7 +6,7 @@ from scipy.fft import fft, fftfreq
 from tabulate import tabulate
 
 # global variables
-folder_name = os.path.abspath(os.path.join("..", "data"))
+FOLDER_NAME = os.path.abspath(os.path.join("..", "data"))
 
 
 def get_data(file_name: str) -> str:
@@ -19,7 +19,7 @@ def get_data(file_name: str) -> str:
     Returns:
         str: The platform-specific path to the file.
     """
-    path = os.path.join(folder_name, file_name)
+    path = os.path.join(FOLDER_NAME, file_name)
     return path
 
 
@@ -81,7 +81,7 @@ def save_processed_data(data: pd.DataFrame) -> None:
     Returns:
         None.
     """
-    path = os.path.join(folder_name, "processed.csv")
+    path = os.path.join(FOLDER_NAME, "processed.csv")
     header = not os.path.exists(path)  # write header only on first write
     data.to_csv(path, mode="a", index=False, header=header)
 
