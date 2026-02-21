@@ -9,28 +9,28 @@ from tabulate import tabulate
 folder_name = os.path.abspath(os.path.join("..", "data"))
 
 
-def get_data(file_name):
+def get_data(file_name: str) -> str:
     """Extracts file from data folder for processing. Ensures compatibility
     across platforms.
 
     Arguments:
-        file_name (String): The full file name of the file to be processed.
+        file_name (str): The full file name of the file to be processed.
 
     Returns:
-        String: The platform-specific path to the file.
+        str: The platform-specific path to the file.
     """
     path = os.path.join(folder_name, file_name)
     return path
 
 
-def transform_to_hz(data):
+def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
     """Converts EEG band power features from time domain samples using FFT.
 
     Arguments:
-        data (pandas DataFrame): The CSV file data in mV to be converted to Hz.
+        data (pd.DataFrame): The CSV file data in mV to be converted to Hz.
 
     Returns:
-        DataFrame: The output set of normalized frequencies after an FFT.
+        pd.DataFrame: The output set of normalized frequencies after an FFT.
     """
     window_size = 256  # sampling rate of Muse 2 headband
     step_size = 128  # 50% overlap between windows
@@ -69,13 +69,24 @@ def transform_to_hz(data):
         elif not new_row.empty and not new_row.isna().all().all():
             fft_df = pd.concat([fft_df, new_row], ignore_index=True)
 
-    path = os.path.join(folder_name, "processed.csv")
-    fft_df.to_csv(path, index=False)
-
     return fft_df
 
 
-def get_stats(data):
+def save_processed_data(data: pd.DataFrame) -> None:
+    """Appends processed EEG band power data to the processed CSV file.
+
+    Arguments:
+        data (pd.DataFrame): Post-FFT band power data to save.
+
+    Returns:
+        None.
+    """
+    path = os.path.join(folder_name, "processed.csv")
+    header = not os.path.exists(path)  # write header only on first write
+    data.to_csv(path, mode='a', index=False, header=header)
+
+
+def get_stats(data: pd.DataFrame) -> None:
     """Gets measures of central tendency and measures of dispersion for a set
     of data.
 
@@ -108,7 +119,7 @@ def get_stats(data):
     print(f"Column interquartile range:\n{iqr.to_string()}\n")
 
 
-def main():
+def run():
     # change to get_data(file) later with file being an arg in main
     file_path = get_data("muse2_eeg_data.csv")
     # path to data file
@@ -138,4 +149,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run()
