@@ -8,6 +8,8 @@ on:
     branches: [ main ]
     types: [ opened, synchronize ]
 
+  workflow_dispatch:
+
 jobs:
   security-scan:
     runs-on: ubuntu-latest
