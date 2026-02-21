@@ -10,6 +10,7 @@ dependencies = [
     "pylsl",
     "matplotlib",
     "serial>=0.0.97",
+    "crcmod>=1.7",
 ]
 
 [dependency-groups]

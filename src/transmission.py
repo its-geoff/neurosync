@@ -7,6 +7,7 @@ pandas DataFrame to UART packet and vice versa.
 import crcmod
 import struct
 import serial
+import pandas as pd
 
 # global variables
 crc8 = crcmod.predefined.mkCrcFun('crc-8')
@@ -28,7 +29,7 @@ def validate_packet(packet: bytes) -> bool:
     return received_checksum == expected_checksum
 
 
-def pack_row(row: dict) -> bytes:
+def df_to_packet(row: dict) -> bytes:
     """Packs a row of EEG band power values to a UART packet.
 
     Arguments:
@@ -45,7 +46,7 @@ def pack_row(row: dict) -> bytes:
     return payload + bytes([checksum])
 
 
-def unpack_packet(ser: serial.Serial) -> dict | None:
+def packet_to_df(ser: serial.Serial) -> dict | None:
     """Unpacks a UART packet into EEG band power values.
 
     Arguments:
@@ -65,24 +66,39 @@ def unpack_packet(ser: serial.Serial) -> dict | None:
     return {'delta': delta, 'theta': theta, 'alpha': alpha, 'beta': beta}
 
 
-def transmit():
+def transmit(df: pd.DataFrame, ser: serial.Serial) -> None:
     """Converts all EEG band power data to UART packets then transmits them
     to the UART.
 
     Arguments:
-        TBD.
+        df (DataFrame): EEG power band data for the delta, theta, alpha, and 
+            beta bands.
+        ser (Serial): Open UART serial connection to transmit on.
 
     Returns:
-        TBD.
+        None.
     """
+    for _, row in df.iterrows():
+        packet = df_to_packet(row)
+        ser.write(packet)
 
 
-def receive():
+def receive(ser: serial.Serial, expected_rows: int) -> pd.DataFrame:
     """Receives all UART packets and converts them back to a pandas DataFrame.
 
     Arguments:
-        TBD.
+        ser (Serial): Open UART serial connection to transmit on.
+        expected_rows (int): Number of expected rows.
 
     Returns:
-        TBD.
+        DataFrame: EEG power band data for the delta, theta, alpha, and beta
+            bands.
     """
+    rows = []
+    for _ in range(expected_rows):
+        row = packet_to_df(ser)
+
+        if row:
+            rows.append(row)
+
+        return pd.DataFrame(rows, columns=["delta", "theta", "alpha", "beta"])
