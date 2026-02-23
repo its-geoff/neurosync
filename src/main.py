@@ -46,6 +46,7 @@ def connect_and_process(ser: serial.Serial) -> None:
 
 def main():
     # initializes serial and automatically cleans up after connection closed
+    # NOTE: change port before running
     with serial.Serial(port="/dev/ttyUSB0", baudrate=115200, timeout=1) as ser:
         connect_and_process(ser)
 

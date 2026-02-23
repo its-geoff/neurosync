@@ -1,4 +1,4 @@
-"""transmission.py.
+"""transmission.py
 
 Calculates the checksum for input data using the CRC8 algorithm. Converts from
 pandas DataFrame to UART packet and vice versa.
@@ -69,7 +69,7 @@ def packet_to_df(ser: serial.Serial) -> dict | None:
     if not validate_packet(packet):
         return None
 
-    delta, theta, alpha, beta = struct.unpack("ffff", packet[:-1])
+    delta, theta, alpha, beta = struct.unpack("HHHH", packet[:-1])
     return {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
 
 
@@ -108,4 +108,4 @@ def receive(ser: serial.Serial, expected_rows: int) -> pd.DataFrame:
         if row:
             rows.append(row)
 
-        return pd.DataFrame(rows, columns=["delta", "theta", "alpha", "beta"])
+    return pd.DataFrame(rows, columns=["delta", "theta", "alpha", "beta"])

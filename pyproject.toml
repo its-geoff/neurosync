@@ -2,6 +2,7 @@
 name = "NeuroSync"
 version = "0.0.1"
 requires-python = "~=3.13"
+
 dependencies = [
     "numpy",
     "pandas",
@@ -11,6 +12,8 @@ dependencies = [
     "matplotlib",
     "serial>=0.0.97",
     "crcmod>=1.7",
+    "pytest>=9.0.2",
+    "pyserial>=3.5",
 ]
 
 [dependency-groups]
@@ -23,6 +26,9 @@ dev = [
     "isort>=7.0.0",
     "safety>=3.7.0",
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.uv]
 package = false
