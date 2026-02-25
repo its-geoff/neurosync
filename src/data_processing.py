@@ -34,7 +34,7 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
     """
     if not isinstance(data, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame")
-    # 2/20/26 added input check to make sure it only runs on a pandas DataFrame :D 
+    # 2/20/26 added input check to make sure it only runs on a pandas DataFrame :D
     window_size = 256  # sampling rate of Muse 2 headband
     step_size = 128  # 50% overlap between windows
     columns = ["delta", "theta", "alpha", "beta"]  # FFT DataFrame columns
@@ -75,10 +75,10 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
     return fft_df
 
 
-#--
+# --
 # get_data
 # Original version is commented nehehehe
-# def get_data(file_name): 
+# def get_data(file_name):
 #     Extracts file from data folder for processing. Ensures compatibility
 #     across platforms.
 #
@@ -88,14 +88,14 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
 #     Returns:
 #         String: The platform-specific path to the file.
 #     original: path = os.path.join(folder_name, file_name)
-#     return path 
+#     return path
 #     # 2/20/26 returns stats instead of printing
-#--
+# --
+
 
 # Updated version for tests & usage:
 def get_data(file_name):
-    """
-    Extracts file from the data folder for processing. Ensures compatibility
+    """Extracts file from the data folder for processing. Ensures compatibility
     across platforms.
 
     Arguments:
@@ -119,8 +119,7 @@ def get_data(file_name):
 # Returns statistical measures for a pandas DataFrame.
 # --
 def get_stats(data):
-    """
-    Returns statistical measures for a pandas DataFrame.
+    """Returns statistical measures for a pandas DataFrame.
 
     Arguments:
         data (pd.DataFrame): Input DataFrame containing numeric columns.
@@ -150,6 +149,7 @@ def get_stats(data):
     }
 
     return stats
+
 
 def run():
     # change to get_data(file) later with file being an arg in main

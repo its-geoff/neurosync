@@ -1,14 +1,17 @@
 # explore_stats.py
-from src import data_processing
 import pandas as pd
 
+from src import data_processing
+
 # Example DataFrame
-fake_data = pd.DataFrame({
-    "delta": [1, 2, 3],
-    "theta": [2, 3, 4],
-    "alpha": [3, 4, 5],
-    "beta": [4, 5, 6]
-})
+fake_data = pd.DataFrame(
+    {
+        "delta": [1, 2, 3],
+        "theta": [2, 3, 4],
+        "alpha": [3, 4, 5],
+        "beta": [4, 5, 6],
+    }
+)
 
 # Get statistics
 stats = data_processing.get_stats(fake_data)

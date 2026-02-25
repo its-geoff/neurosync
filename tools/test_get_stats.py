@@ -1,22 +1,27 @@
-import sys
 import os
+import sys
 import unittest
+
 import pandas as pd
 
 # Allow import from src directory
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
+)
 import data_processing
 
 
 class TestGetStats(unittest.TestCase):
 
     def test_valid_input(self):
-        fake_data = pd.DataFrame({
-            "delta": [1, 2, 3],
-            "theta": [2, 3, 4],
-            "alpha": [3, 4, 5],
-            "beta": [4, 5, 6]
-        })
+        fake_data = pd.DataFrame(
+            {
+                "delta": [1, 2, 3],
+                "theta": [2, 3, 4],
+                "alpha": [3, 4, 5],
+                "beta": [4, 5, 6],
+            }
+        )
 
         stats = data_processing.get_stats(fake_data)
         self.assertIsInstance(stats, dict)
@@ -38,5 +43,5 @@ class TestGetStats(unittest.TestCase):
             data_processing.get_stats("not a dataframe")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
