@@ -3,10 +3,6 @@ import os
 import pytest
 import pandas as pd
 import numpy as np
-
-# Allow import from src directory
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
-
 import data_processing
 
 # get_data()
