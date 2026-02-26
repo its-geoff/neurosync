@@ -138,3 +138,5 @@ class TestPacketToDf:
 
         result = packet_to_df(mock_ser)
         assert result == {"delta": 41, "theta": 86, "alpha": 31, "beta": 12}
+
+    def test_

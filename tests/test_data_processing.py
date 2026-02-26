@@ -2,18 +2,18 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import data_processing
+from data_processing import get_data, get_stats, transform_to_hz, run
 
 # get_data()
 
 
 def test_get_data_valid():
-    path = data_processing.get_data("test.csv")
+    path = get_data("test.csv")
     assert path.endswith("test.csv")
 
 
 def test_get_data_empty_string():
-    path = data_processing.get_data("")
+    path = get_data("")
     assert isinstance(path, str)
 
 
@@ -26,7 +26,7 @@ def test_transform_to_hz_valid():
         np.random.rand(256, 4), columns=["ch1", "ch2", "ch3", "ch4"]
     )
 
-    result = data_processing.transform_to_hz(fake_data)
+    result = transform_to_hz(fake_data)
 
     assert isinstance(result, pd.DataFrame)
     assert list(result.columns) == ["delta", "theta", "alpha", "beta"]
@@ -38,13 +38,13 @@ def test_transform_to_hz_small_input():
         np.random.rand(100, 4), columns=["ch1", "ch2", "ch3", "ch4"]
     )
 
-    result = data_processing.transform_to_hz(small_data)
+    result = transform_to_hz(small_data)
     assert result.empty
 
 
 def test_transform_to_hz_invalid_input():
     with pytest.raises(Exception):
-        data_processing.transform_to_hz("not a dataframe")
+        transform_to_hz("not a dataframe")
 
 
 # get_stats()
@@ -60,7 +60,7 @@ def test_get_stats_valid():
         }
     )
 
-    result = data_processing.get_stats(fake_data)
+    result = get_stats(fake_data)
     assert isinstance(result, dict)
     expected_keys = [
         "mean",
@@ -77,10 +77,10 @@ def test_get_stats_valid():
 
 def test_get_stats_empty():
     empty_df = pd.DataFrame(columns=["delta", "theta", "alpha", "beta"])
-    result = data_processing.get_stats(empty_df)
+    result = get_stats(empty_df)
     assert result is None
 
 
 def test_get_stats_invalid_input():
     with pytest.raises(TypeError):
-        data_processing.get_stats("not a dataframe")
+        get_stats("not a dataframe")
