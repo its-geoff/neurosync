@@ -9,8 +9,27 @@ from tabulate import tabulate
 FOLDER_NAME = os.path.abspath(os.path.join("..", "data"))
 
 
-def get_data(file_name: str) -> str:
-    """Extracts file from data folder for processing. Ensures compatibility
+# --
+# get_data
+# Original version is commented nehehehe
+# def get_data(file_name):
+#     Extracts file from data folder for processing. Ensures compatibility
+#     across platforms.
+#
+#     Arguments:
+#         file_name (String): The full file name of the file to be processed.
+#
+#     Returns:
+#         String: The platform-specific path to the file.
+#     original: path = os.path.join(folder_name, file_name)
+#     return path
+#     # 2/20/26 returns stats instead of printing
+# --
+
+
+# Updated version for tests & usage:
+def get_data(file_name):
+    """Extracts file from the data folder for processing. Ensures compatibility
     across platforms.
 
     Arguments:
@@ -18,8 +37,15 @@ def get_data(file_name: str) -> str:
 
     Returns:
         str: The platform-specific path to the file.
+
+    Change note: 2/20/26 — uncommented and fixed indentation so that function
+    works.
     """
-    path = os.path.join(FOLDER_NAME, file_name)
+    if not isinstance(file_name, str):
+        raise TypeError("file_name must be a string")
+
+    folder_name = "data"
+    path = os.path.join(folder_name, file_name)
     return path
 
 
@@ -34,7 +60,7 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
     """
     if not isinstance(data, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame")
-    # 2/20/26 added input check to make sure it only runs on a pandas DataFrame :D
+    # 2/20/26 added input check to make sure it only runs on a pandas DataFrame
     window_size = 256  # sampling rate of Muse 2 headband
     step_size = 128  # 50% overlap between windows
     columns = ["delta", "theta", "alpha", "beta"]  # FFT DataFrame columns
@@ -73,45 +99,6 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
             fft_df = pd.concat([fft_df, new_row], ignore_index=True)
 
     return fft_df
-
-
-# --
-# get_data
-# Original version is commented nehehehe
-# def get_data(file_name):
-#     Extracts file from data folder for processing. Ensures compatibility
-#     across platforms.
-#
-#     Arguments:
-#         file_name (String): The full file name of the file to be processed.
-#
-#     Returns:
-#         String: The platform-specific path to the file.
-#     original: path = os.path.join(folder_name, file_name)
-#     return path
-#     # 2/20/26 returns stats instead of printing
-# --
-
-
-# Updated version for tests & usage:
-def get_data(file_name):
-    """Extracts file from the data folder for processing. Ensures compatibility
-    across platforms.
-
-    Arguments:
-        file_name (str): The full file name of the file to be processed.
-
-    Returns:
-        str: The platform-specific path to the file.
-
-    Change note: 2/20/26 — uncommented and fixed indentation so that function works.
-    """
-    if not isinstance(file_name, str):
-        raise TypeError("file_name must be a string")
-
-    folder_name = "data"
-    path = os.path.join(folder_name, file_name)
-    return path
 
 
 # --
