@@ -121,3 +121,16 @@ class TestDfToPacket:
 
         assert len(packet) == 12
         assert validate_packet(packet[3:]) is True
+
+
+class TestPacketToDf:
+    def _mock_serial(self, data: bytes) -> MagicMock:
+        """Create a mock serial connection and return the object."""
+        mock_ser = MagicMock()
+        mock_ser.read.return_value = data  # defines return value of mock.read
+
+        return mock_ser
+
+    def test_valid_packet(self):
+        packet = build_valid_packet()
+        mock_ser = self._mock_serial(packet)
