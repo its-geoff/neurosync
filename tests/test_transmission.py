@@ -1,4 +1,5 @@
 import struct
+import pytest
 from unittest.mock import MagicMock, call, patch
 
 import crcmod
@@ -134,3 +135,6 @@ class TestPacketToDf:
     def test_valid_packet(self):
         packet = build_valid_packet()
         mock_ser = self._mock_serial(packet)
+
+        result = packet_to_df(mock_ser)
+        assert result == {"delta": 41, "theta": 86, "alpha": 31, "beta": 12}
