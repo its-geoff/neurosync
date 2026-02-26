@@ -1,27 +1,21 @@
 import struct
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, call, patch
 
 import crcmod
 import pandas as pd
 import serial
 
 import data_processing
-from transmission import (
-    PAYLOAD_LENGTH,
-    SYNC_BYTE_1,
-    SYNC_BYTE_2,
-    df_to_packet,
-    packet_to_df,
-    receive,
-    transmit,
-    validate_packet,
-)
+from transmission import (PAYLOAD_LENGTH, SYNC_BYTE_1, SYNC_BYTE_2,
+                          df_to_packet, packet_to_df, receive, transmit,
+                          validate_packet)
 
 # helper function with creation of mock packet
 
 crc8 = crcmod.predefined.mkCrcFun("crc-8")
 
 SAMPLE_ROW = {"delta": 41, "theta": 86, "alpha": 31, "beta": 12}
+
 
 def build_valid_packet(delta=41, theta=86, alpha=31, beta=12) -> bytes:
     """Build a packet using the same logic as df_to_packet for use in tests."""
@@ -32,6 +26,7 @@ def build_valid_packet(delta=41, theta=86, alpha=31, beta=12) -> bytes:
 
 
 # test cases
+
 
 class TestValidatePacket:
     def test_valid_packet_returns_true(self):
@@ -66,7 +61,7 @@ class TestValidatePacket:
         packet = payload + bytes([checksum])
 
         assert validate_packet(packet) is True
-    
+
     def test_zero_payload(self):
         payload = struct.pack("HHHH", 0, 0, 0, 0)
         checksum = crc8(payload)

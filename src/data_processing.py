@@ -32,6 +32,9 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The output set of normalized frequencies after an FFT.
     """
+    if not isinstance(data, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame")
+    # 2/20/26 added input check to make sure it only runs on a pandas DataFrame :D
     window_size = 256  # sampling rate of Muse 2 headband
     step_size = 128  # 50% overlap between windows
     columns = ["delta", "theta", "alpha", "beta"]  # FFT DataFrame columns
@@ -72,51 +75,80 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
     return fft_df
 
 
-def save_processed_data(data: pd.DataFrame) -> None:
-    """Appends processed EEG band power data to the processed CSV file.
+# --
+# get_data
+# Original version is commented nehehehe
+# def get_data(file_name):
+#     Extracts file from data folder for processing. Ensures compatibility
+#     across platforms.
+#
+#     Arguments:
+#         file_name (String): The full file name of the file to be processed.
+#
+#     Returns:
+#         String: The platform-specific path to the file.
+#     original: path = os.path.join(folder_name, file_name)
+#     return path
+#     # 2/20/26 returns stats instead of printing
+# --
+
+
+# Updated version for tests & usage:
+def get_data(file_name):
+    """Extracts file from the data folder for processing. Ensures compatibility
+    across platforms.
 
     Arguments:
-        data (pd.DataFrame): Post-FFT band power data to save.
+        file_name (str): The full file name of the file to be processed.
 
     Returns:
-        None.
+        str: The platform-specific path to the file.
+
+    Change note: 2/20/26 — uncommented and fixed indentation so that function works.
     """
-    path = os.path.join(FOLDER_NAME, "processed.csv")
-    header = not os.path.exists(path)  # write header only on first write
-    data.to_csv(path, mode="a", index=False, header=header)
+    if not isinstance(file_name, str):
+        raise TypeError("file_name must be a string")
+
+    folder_name = "data"
+    path = os.path.join(folder_name, file_name)
+    return path
 
 
-def get_stats(data: pd.DataFrame) -> None:
-    """Gets measures of central tendency and measures of dispersion for a set
-    of data.
+# --
+# get_stats
+# Returns statistical measures for a pandas DataFrame.
+# --
+def get_stats(data):
+    """Returns statistical measures for a pandas DataFrame.
 
     Arguments:
-        data (pandas DataFrame): The post-FFT data in Hz to be analyzed.
+        data (pd.DataFrame): Input DataFrame containing numeric columns.
 
     Returns:
-        None.
+        dict: Dictionary containing mean, median, mode, range, variance,
+              standard deviation, and interquartile range of the columns.
+              Returns None if DataFrame is empty.
+
+    Raises:
+        TypeError: If input is not a pandas DataFrame.
     """
-    # measures of central tendency
-    mean = data.mean()
-    median = data.median()
-    mode = data.mode()
+    if not isinstance(data, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame")
 
-    # measures of dispersion
-    rnge = data.max() - data.min()
-    variance = data.var()
-    std_dev = data.std()
-    iqr = data.quantile(0.75) - data.quantile(0.25)
+    if data.empty:
+        return None
 
-    # output
-    print("\n--- Measures of Central Tendency ---\n")
-    print(f"Column means:\n{mean.to_string()}\n")
-    print(f"Column medians:\n{median.to_string()}\n")
-    print(f"Column modes:\n{mode.to_string()}\n")
-    print("\n--- Measures of Dispersion ---\n")
-    print(f"Column ranges:\n{rnge.to_string()}\n")
-    print(f"Column variance:\n{variance.to_string()}\n")
-    print(f"Column standard deviation:\n{std_dev.to_string()}\n")
-    print(f"Column interquartile range:\n{iqr.to_string()}\n")
+    stats = {
+        "mean": data.mean(),
+        "median": data.median(),
+        "mode": data.mode(),
+        "range": data.max() - data.min(),
+        "variance": data.var(),
+        "std_dev": data.std(),
+        "iqr": data.quantile(0.75) - data.quantile(0.25),
+    }
+
+    return stats
 
 
 def run():
