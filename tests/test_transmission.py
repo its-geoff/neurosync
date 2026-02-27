@@ -198,7 +198,7 @@ class TestTransmit:
         )
         transmit(df, mock_ser)
 
-        mock_ser.write.call_count == 4
+        assert mock_ser.write.call_count == 5
 
     def test_writes_correct_bytes(self):
         packet = build_valid_packet()
@@ -274,7 +274,7 @@ class TestReceive:
         mock_ser = self._mock_serial(packet)
         receive(mock_ser, 3)
 
-        mock_ser.read.call_count == 3
+        assert mock_ser.read.call_count == 3
 
     def test_zero_expected_rows_returns_empty_df(self):
         packet = build_valid_packet()

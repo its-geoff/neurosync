@@ -10,7 +10,6 @@ dependencies = [
     "tabulate",
     "pylsl",
     "matplotlib",
-    "serial>=0.0.97",
     "crcmod>=1.7",
     "pytest>=9.0.2",
     "pyserial>=3.5",

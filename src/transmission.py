@@ -37,7 +37,7 @@ def df_to_packet(row: pd.Series) -> bytes:
     """Packs a row of EEG band power values to a UART packet.
 
     Arguments:
-        row (dict): A dict of EEG band power values.
+        row (pd.Series): A pandas Series of EEG band power values.
 
     Returns:
         bytes: A set of bytes in the form of a UART packet.
@@ -57,7 +57,7 @@ def packet_to_df(ser: serial.Serial) -> dict | None:
     """Unpacks a UART packet into EEG band power values.
 
     Arguments:
-        packet (bytes): A set of bytes in the form of a UART packet.
+        packet (serial.Serial): An open UART serial to read a UART packet from.
 
     Returns:
         dict: A dict of EEG band power values.
