@@ -26,14 +26,14 @@ def validate_packet(packet: bytes) -> bool:
     Returns:
         True if checksum is valid, False otherwise.
     """
-    payload = packet[:-1]
+    payload = packet[3:-1]
     received_checksum = packet[-1]
     expected_checksum = crc8(payload)
 
     return received_checksum == expected_checksum
 
 
-def df_to_packet(row: dict) -> bytes:
+def df_to_packet(row: pd.Series) -> bytes:
     """Packs a row of EEG band power values to a UART packet.
 
     Arguments:
@@ -69,7 +69,7 @@ def packet_to_df(ser: serial.Serial) -> dict | None:
     if not validate_packet(packet):
         return None
 
-    delta, theta, alpha, beta = struct.unpack("HHHH", packet[:-1])
+    delta, theta, alpha, beta = struct.unpack("HHHH", packet[3:-1])
     return {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
 
 

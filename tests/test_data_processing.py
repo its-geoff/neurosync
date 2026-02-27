@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from data_processing import get_data, get_stats, transform_to_hz, run
+from data_processing import get_data, get_stats, transform_to_hz
 
 # get_data()
 
