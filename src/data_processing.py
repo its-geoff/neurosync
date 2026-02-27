@@ -6,37 +6,61 @@ from scipy.fft import fft, fftfreq
 from tabulate import tabulate
 
 # global variables
-folder_name = os.path.abspath(os.path.join("..", "data"))
+FOLDER_NAME = os.path.abspath(os.path.join("..", "data"))
 
 
-import os
-import pandas as pd
+# --
+# get_data
+# Original version is commented nehehehe
+# def get_data(file_name):
+#     Extracts file from data folder for processing. Ensures compatibility
+#     across platforms.
+#
+#     Arguments:
+#         file_name (String): The full file name of the file to be processed.
+#
+#     Returns:
+#         String: The platform-specific path to the file.
+#     original: path = os.path.join(folder_name, file_name)
+#     return path
+#     # 2/20/26 returns stats instead of printing
+# --
 
+
+# Updated version for tests & usage:
 def get_data(file_name):
-    """Extracts file from data folder for processing. Ensures compatibility
+    """Extracts file from the data folder for processing. Ensures compatibility
     across platforms.
 
     Arguments:
-        file_name (String): The full file name of the file to be processed.
+        file_name (str): The full file name of the file to be processed.
 
     Returns:
-        String: The platform-specific path to the file.
+        str: The platform-specific path to the file.
+
+    Change note: 2/20/26 — uncommented and fixed indentation so that function
+    works.
     """
+    if not isinstance(file_name, str):
+        raise TypeError("file_name must be a string")
+
+    folder_name = "data"
     path = os.path.join(folder_name, file_name)
     return path
 
-def transform_to_hz(data):
+
+def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
     """Converts EEG band power features from time domain samples using FFT.
 
     Arguments:
-        data (pandas DataFrame): The CSV file data in mV to be converted to Hz.
+        data (pd.DataFrame): The CSV file data in mV to be converted to Hz.
 
     Returns:
-        DataFrame: The output set of normalized frequencies after an FFT.
+        pd.DataFrame: The output set of normalized frequencies after an FFT.
     """
     if not isinstance(data, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame")
-    # 2/20/26 added input check to make sure it only runs on a pandas DataFrame :D 
+    # 2/20/26 added input check to make sure it only runs on a pandas DataFrame
     window_size = 256  # sampling rate of Muse 2 headband
     step_size = 128  # 50% overlap between windows
     columns = ["delta", "theta", "alpha", "beta"]  # FFT DataFrame columns
@@ -74,49 +98,7 @@ def transform_to_hz(data):
         elif not new_row.empty and not new_row.isna().all().all():
             fft_df = pd.concat([fft_df, new_row], ignore_index=True)
 
-    path = os.path.join(folder_name, "processed.csv")
-    fft_df.to_csv(path, index=False)
-
     return fft_df
-
-
-#--
-# get_data
-# Original version is commented nehehehe
-# def get_data(file_name): 
-#     Extracts file from data folder for processing. Ensures compatibility
-#     across platforms.
-#
-#     Arguments:
-#         file_name (String): The full file name of the file to be processed.
-#
-#     Returns:
-#         String: The platform-specific path to the file.
-#     original: path = os.path.join(folder_name, file_name)
-#     return path 
-#     # 2/20/26 returns stats instead of printing
-#--
-
-# Updated version for tests & usage:
-def get_data(file_name):
-    """
-    Extracts file from the data folder for processing. Ensures compatibility
-    across platforms.
-
-    Arguments:
-        file_name (str): The full file name of the file to be processed.
-
-    Returns:
-        str: The platform-specific path to the file.
-
-    Change note: 2/20/26 — uncommented and fixed indentation so that function works.
-    """
-    if not isinstance(file_name, str):
-        raise TypeError("file_name must be a string")
-
-    folder_name = "data"
-    path = os.path.join(folder_name, file_name)
-    return path
 
 
 # --
@@ -124,8 +106,7 @@ def get_data(file_name):
 # Returns statistical measures for a pandas DataFrame.
 # --
 def get_stats(data):
-    """
-    Returns statistical measures for a pandas DataFrame.
+    """Returns statistical measures for a pandas DataFrame.
 
     Arguments:
         data (pd.DataFrame): Input DataFrame containing numeric columns.
@@ -156,7 +137,8 @@ def get_stats(data):
 
     return stats
 
-def main():
+
+def run():
     # change to get_data(file) later with file being an arg in main
     file_path = get_data("muse2_eeg_data.csv")
     # path to data file
@@ -186,4 +168,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run()
