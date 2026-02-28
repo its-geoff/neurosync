@@ -16,6 +16,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       matrix:
         python-version: [3.13]
@@ -24,8 +26,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
         ref: ${{ github.head_ref }}
+        fetch-depth: 0
 
     - name: Install uv
       uses: astral-sh/setup-uv@v4
@@ -37,9 +39,7 @@ jobs:
       run: uv python install 3.13
 
     - name: Install dependencies
-      run: |
-        uv sync --frozen --all-extras
-        uv pip install -e .
+      run: uv sync --frozen --all-extras
 
     - name: Format code
       run: |
