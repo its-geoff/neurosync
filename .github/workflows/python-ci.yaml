@@ -16,6 +16,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       matrix:
         python-version: [3.13]
@@ -23,6 +25,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
 
     - name: Install uv
       uses: astral-sh/setup-uv@v4
@@ -31,23 +36,28 @@ jobs:
         cache-dependency-glob: "uv.lock"
 
     - name: Set up Python
-      run: uv python install ${{ matrix.python-version }}
+      run: uv python install 3.13
 
     - name: Install dependencies
       run: uv sync --frozen --all-extras
 
-    - name: Check formatting
-      run: uv run black --check . --exclude "/(\.venv|\.git|__pycache__)/"
-
-    - name: Check import sorting
-      run: uv run isort --check-only . --skip .venv --skip .git --skip __pycache__
-
-    # no tests added yet
-    # - name: Run tests
-    #   run: uv run pytest -v
+    - name: Format code
+      run: |
+        uv run black . --exclude "/(\.venv|\.git|__pycache__)/"
+        uv run isort . --skip .venv --skip .git --skip __pycache__
+        find src -name "*.py" -exec uv run --quiet docformatter --wrap-summaries 79 --wrap-descriptions 79 --in-place {} +
 
     - name: Lint code
       run: uv run flake8 .
+
+    - name: Commit formatting changes
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "style: auto-format with black, isort, and docformatter"
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Run tests
+      run: uv run pytest -v
 
   security:
     runs-on: ubuntu-latest
