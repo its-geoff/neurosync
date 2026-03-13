@@ -5,6 +5,11 @@ import pytest
 from data_processing import get_data, get_stats, transform_to_hz
 
 # get_data()
+# Unit tests for the data_processing module.
+# These tests validate:
+# - get_data(): file path resolution
+# - transform_to_hz(): conversion of raw EEG signals into frequency bands
+# - get_stats(): statistical analysis of EEG frequency band data
 
 
 def test_get_data_valid():
