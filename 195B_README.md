@@ -9,7 +9,7 @@
 | Geoffrey Agustin | [@its-geoff](https://github.com/its-geoff) | geoffrey.agustin@sjsu.edu |
 | Jairo Manansala | [@jairomanansala](https://github.com/jairomanansala) | jairo.manansala@sjsu.edu |
 | Garrett Miller | [@GaM1404](https://github.com/GaM1404) | garrett.miller@sjsu.edu |
-| Uyen "Hillary" Vu | [@spicyMcChickens](https://github.com/spicyMcChickens) | uyen.vu02@sjsu.edu |
+| Uyen Vu (Hillary Vu) | [@spicyMcChickens](https://github.com/spicyMcChickens) | uyen.vu02@sjsu.edu |
 
 **Advisor:** Charan Bhaskar
 
