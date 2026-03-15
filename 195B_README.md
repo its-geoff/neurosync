@@ -106,6 +106,7 @@ python3 main.py
 ### Running Tests
 
 ```bash
+cd software/
 pytest
 ```
 
