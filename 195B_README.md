@@ -54,6 +54,7 @@ NeuroSync addresses the problem by utilizing electroencephalogram (EEG) technolo
 | Category | Technology |
 |----------|------------|
 | Language | SystemVerilog |
+| Communication Protocol | UART |
 | FPGA Board | Diligent Nexys A7-100T |
 | EEG headband | Muse 2 |
 
@@ -63,6 +64,7 @@ NeuroSync addresses the problem by utilizing electroencephalogram (EEG) technolo
 | Language | Python 3.13.* |
 | Package Management | uv |
 | Signal Processing | SciPy, NumPy |
+| Data Formatting and Analysis | pandas |
 | Data I/O | pyserial, muselsl/pylsl |
 | Testing | PyTest |
 
