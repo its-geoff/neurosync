@@ -54,6 +54,7 @@ NeuroSync addresses the problem by utilizing electroencephalogram (EEG) technolo
 | Category | Technology |
 |----------|------------|
 | Language | SystemVerilog |
+| Communication Protocol | UART |
 | FPGA Board | Diligent Nexys A7-100T |
 | EEG headband | Muse 2 |
 
