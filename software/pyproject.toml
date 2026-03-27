@@ -46,6 +46,7 @@ url = "https://pypi.org/simple"
 
 [tool.isort]
 profile = "black"
+line-length = 79
 
 [tool.black]
 line-length = 79
