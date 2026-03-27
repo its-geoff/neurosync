@@ -147,6 +147,9 @@ Use clear, descriptive commit messages:
 - `Fix database connection timeout issue`
 - `Update README with setup instructions`
 
+## Documentation
+- [Architecture](docs/architecture.md)
+
 ---
 
 ## Acknowledgments
