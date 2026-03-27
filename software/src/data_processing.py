@@ -1,3 +1,11 @@
+"""
+data_processing.py
+
+Processes EEG data for Muse 2, including:
+- Reading CSV
+- FFT transformation
+- Statistical calculations
+"""
 import os
 
 import numpy as np
@@ -139,6 +147,9 @@ def get_stats(data):
 
 
 def run():
+    """Reads CSV EEG data, transforms it to frequency bands, prints sample data, 
+    and calculates statistics.
+    """
     # change to get_data(file) later with file being an arg in main
     file_path = get_data("muse2_eeg_data.csv")
     # path to data file
@@ -169,3 +180,19 @@ def run():
 
 if __name__ == "__main__":
     run()
+def process_pipeline(df: pd.DataFrame):
+    """
+    Full dynamic processing pipeline:
+    raw EEG → FFT → stats
+    """
+    df = df.drop(columns=["timestamp"], errors="ignore")
+
+    df_channels = df[["ch1", "ch2", "ch3", "ch4"]]
+
+    freq_data = transform_to_hz(df_channels)
+    stats = get_stats(freq_data)
+
+    return {
+        "frequency_data": freq_data,
+        "stats": stats,
+    }
