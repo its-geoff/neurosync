@@ -75,6 +75,7 @@ module fractal_lowres_renderer #(
             fb_mem[fb_wr_addr] <= fb_wr_data;
     end
 
+    // synchronous read
     always_ff @(posedge clk) begin
         fb_rd_data <= fb_mem[fb_rd_addr];
     end
@@ -92,6 +93,9 @@ module fractal_lowres_renderer #(
     logic [11:0] cur_x, cur_y;
     logic [14:0] cur_addr;
 
+    // frame valid goes high after one complete low-res frame is rendered
+    logic frame_valid;
+
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             rstate      <= R_IDLE;
@@ -104,6 +108,7 @@ module fractal_lowres_renderer #(
             fb_we       <= 1'b0;
             fb_wr_addr  <= 15'd0;
             fb_wr_data  <= 12'd0;
+            frame_valid <= 1'b0;
         end else begin
             render_req <= 1'b0;
             fb_we      <= 1'b0;
@@ -125,8 +130,9 @@ module fractal_lowres_renderer #(
                         if (cur_x == FB_W-1) begin
                             cur_x <= 12'd0;
                             if (cur_y == FB_H-1) begin
-                                cur_y    <= 12'd0;
-                                cur_addr <= 15'd0;
+                                cur_y       <= 12'd0;
+                                cur_addr    <= 15'd0;
+                                frame_valid <= 1'b1;
                             end else begin
                                 cur_y    <= cur_y + 12'd1;
                                 cur_addr <= cur_addr + 15'd1;
@@ -157,8 +163,24 @@ module fractal_lowres_renderer #(
         fb_rd_addr = fb_y * FB_W + fb_x;
     end
 
-    assign out_red   = px_active ? fb_rd_data[11:8] : 4'd0;
-    assign out_green = px_active ? fb_rd_data[7:4]  : 4'd0;
-    assign out_blue  = px_active ? fb_rd_data[3:0]  : 4'd0;
+    // ============================================================
+    // Align active signal to synchronous framebuffer read
+    // ============================================================
+    logic px_active_d;
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            px_active_d <= 1'b0;
+        else
+            px_active_d <= px_active;
+    end
+
+    // ============================================================
+    // Output gating
+    // Do not show framebuffer until one complete frame is rendered
+    // ============================================================
+    assign out_red   = (px_active_d && frame_valid) ? fb_rd_data[11:8] : 4'd0;
+    assign out_green = (px_active_d && frame_valid) ? fb_rd_data[7:4]  : 4'd0;
+    assign out_blue  = (px_active_d && frame_valid) ? fb_rd_data[3:0]  : 4'd0;
 
 endmodule
