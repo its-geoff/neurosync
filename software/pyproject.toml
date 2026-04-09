@@ -46,8 +46,8 @@ url = "https://pypi.org/simple"
 
 [tool.isort]
 profile = "black"
-line-length = 79
+line_length = 79
 
 [tool.black]
-line_length = 79
-py_version = 313
+line-length = 79
+target-version = ["py313"]
