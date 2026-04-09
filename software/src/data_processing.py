@@ -52,8 +52,7 @@ def get_data(file_name):
     if not isinstance(file_name, str):
         raise TypeError("file_name must be a string")
 
-    folder_name = "data"
-    path = os.path.join(folder_name, file_name)
+    path = os.path.join(FOLDER_NAME, file_name)
     return path
 
 
