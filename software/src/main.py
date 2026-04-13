@@ -1,5 +1,4 @@
-"""
-main.py
+"""main.py.
 
 Streams EEG data from Muse 2 via LSL, computes band power features per window,
 and transmits each result over UART in real time.
@@ -59,7 +58,8 @@ def connect_and_process(ser: serial.Serial) -> None:
 
 
 def main():
-    """Opens a UART serial connection and starts streaming and processing EEG data."""
+    """Opens a UART serial connection and starts streaming and processing EEG
+    data."""
     mode = input("Select mode (lsl / csv): ").strip().lower()
 
     if mode == "lsl":
