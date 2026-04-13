@@ -47,7 +47,7 @@ jobs:
     - name: Format code
       run: |
         uv run black . --exclude "/(\.venv|\.git|__pycache__)/"
-        uv run isort . --skip .venv --skip .git --skip __pycache__
+        uv run isort .
         find src -name "*.py" -exec uv run --quiet docformatter --wrap-summaries 79 --wrap-descriptions 79 --in-place {} +
 
     - name: Lint code

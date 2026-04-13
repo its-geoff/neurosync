@@ -47,6 +47,7 @@ url = "https://pypi.org/simple"
 [tool.isort]
 profile = "black"
 line_length = 79
+skip = [".venv", ".git", "__pycache__"]
 
 [tool.black]
 line-length = 79
