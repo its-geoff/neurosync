@@ -1,17 +1,16 @@
-"""
-main.py
+"""main.py.
 
 Streams EEG data from Muse 2 via LSL, computes band power features per window,
 and transmits each result over UART in real time.
 """
-import os # standard library
-import sys
 
-import pandas as pd # third-party
+import os  # standard library
+
+import pandas as pd  # third-party
 import serial
 from pylsl import StreamInlet, resolve_streams
 
-import data_processing # local
+import data_processing  # local
 import transmission
 
 
@@ -43,7 +42,7 @@ def connect_and_process(ser: serial.Serial) -> None:
                 window_df = pd.DataFrame(
                     buffer[:256], columns=["ch1", "ch2", "ch3", "ch4"]
                 )
-                #change below:
+                # change below:
                 # band_power_df = data_processing.transform_to_hz(window_df)
                 result = data_processing.process_pipeline(window_df)
                 band_power_df = result["frequency_data"]
@@ -57,8 +56,10 @@ def connect_and_process(ser: serial.Serial) -> None:
     except KeyboardInterrupt:
         print("Stream interrupted. Closing.")
 
+
 def main():
-    """Opens a UART serial connection and starts streaming and processing EEG data."""
+    """Opens a UART serial connection and starts streaming and processing EEG
+    data."""
     mode = input("Select mode (lsl / csv): ").strip().lower()
 
     if mode == "lsl":
@@ -85,12 +86,14 @@ def main():
 
     else:
         print("Invalid mode")
+
+
 # OG main function below
-#def main():
-    # initializes serial and automatically cleans up after connection closed
-    # NOTE: change port before running
-    #with serial.Serial(port="/dev/ttyUSB0", baudrate=115200, timeout=1) as ser:
-        #connect_and_process(ser)
+# def main():
+# initializes serial and automatically cleans up after connection closed
+# NOTE: change port before running
+# with serial.Serial(port="/dev/ttyUSB0", baudrate=115200, timeout=1) as ser:
+# connect_and_process(ser)
 
 
 if __name__ == "__main__":
