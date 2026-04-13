@@ -57,7 +57,7 @@ jobs:
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "style: auto-format with black, isort, and docformatter"
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.COMMIT_PAT }}
 
     - name: Run tests
       run: uv run pytest -v
