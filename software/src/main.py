@@ -6,7 +6,6 @@ and transmits each result over UART in real time.
 """
 
 import os  # standard library
-import sys
 
 import pandas as pd  # third-party
 import serial
