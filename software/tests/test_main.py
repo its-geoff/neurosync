@@ -1,8 +1,7 @@
-import struct
 import sys
 import types
 import unittest
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pandas as pd
@@ -304,7 +303,8 @@ class TestConnectAndProcessOverlap(unittest.TestCase):
         ):
             main.connect_and_process(_make_fake_ser())
 
-        # 383 samples: first window at 256, then 255 in buffer — not enough for second
+        # 383 samples: first window at 256, then 255 in buffer — not enough for
+        # second
         self.assertEqual(call_count["n"], 1)
 
 
@@ -392,7 +392,8 @@ class TestConnectAndProcessShutdown(unittest.TestCase):
                 main.connect_and_process(_make_fake_ser())
             except KeyboardInterrupt:
                 self.fail(
-                    "KeyboardInterrupt was not caught inside connect_and_process"
+                    "KeyboardInterrupt was not caught inside " \
+                    "connect_and_process"
                 )
 
     def test_partial_buffer_discarded_on_interrupt(self):
