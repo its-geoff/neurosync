@@ -392,7 +392,7 @@ class TestConnectAndProcessShutdown(unittest.TestCase):
                 main.connect_and_process(_make_fake_ser())
             except KeyboardInterrupt:
                 self.fail(
-                    "KeyboardInterrupt was not caught inside " \
+                    "KeyboardInterrupt was not caught inside "
                     "connect_and_process"
                 )
 

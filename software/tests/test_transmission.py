@@ -15,6 +15,8 @@ from transmission import (
     validate_packet,
 )
 
+# BUG FIX: test_transmission fails with all tests, succeeds when isolated
+
 # helper function with creation of mock packet
 crc8 = crcmod.predefined.mkCrcFun("crc-8")
 
