@@ -23,6 +23,7 @@ dev = [
     "flake8>=7.3.0",
     "flake8-pyproject>=1.2.4",
     "isort>=7.0.0",
+    "pytest-cov>=7.1.0",
     "safety>=3.7.0",
 ]
 
@@ -43,6 +44,11 @@ default = true
 [[tool.uv.index]]
 name = "pypi"
 url = "https://pypi.org/simple"
+
+[tool.isort]
+profile = "black"
+line_length = 79
+skip = [".venv", ".git", "__pycache__"]
 
 [tool.black]
 line-length = 79

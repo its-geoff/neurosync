@@ -4,9 +4,16 @@ from unittest.mock import MagicMock, call
 import crcmod
 import pandas as pd
 
-from transmission import (PAYLOAD_LENGTH, SYNC_BYTE_1, SYNC_BYTE_2,
-                          df_to_packet, packet_to_df, receive, transmit,
-                          validate_packet)
+from transmission import (
+    PAYLOAD_LENGTH,
+    SYNC_BYTE_1,
+    SYNC_BYTE_2,
+    df_to_packet,
+    packet_to_df,
+    receive,
+    transmit,
+    validate_packet,
+)
 
 # helper function with creation of mock packet
 crc8 = crcmod.predefined.mkCrcFun("crc-8")
