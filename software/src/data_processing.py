@@ -6,6 +6,7 @@ Processes EEG data for Muse 2, including:
 - Statistical calculations
 """
 
+
 import os
 
 import numpy as np
@@ -166,8 +167,8 @@ def process_pipeline(df: pd.DataFrame):
 
 
 def run():
-    """Reads CSV EEG data, transforms it to frequency bands, prints sample
-    data, and calculates statistics.
+    """Reads CSV EEG data, transforms it to frequency bands, prints sample data,
+    and calculates statistics.
 
     Arguments:
         None.
