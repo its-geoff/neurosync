@@ -1,4 +1,4 @@
-"""main.py.
+"""main.py
 
 Streams EEG data from Muse 2 via LSL, computes band power features per window,
 and transmits each result over UART in real time.

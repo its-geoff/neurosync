@@ -1,4 +1,4 @@
-"""data_processing.py.
+"""data_processing.py
 
 Processes EEG data for Muse 2, including:
 - Reading CSV

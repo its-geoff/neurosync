@@ -27,20 +27,28 @@ def test_get_data_empty_string():
 
 def test_transform_to_hz_valid():
     # Create fake EEG data (256 rows, 4 channels)
+    data = np.random.rand(256, 4)
+    timestamps = np.ones((256, 1))
+    combined_data = np.hstack((timestamps, data))
+    
     fake_data = pd.DataFrame(
-        np.random.rand(256, 4), columns=["ch1", "ch2", "ch3", "ch4"]
+        combined_data, columns=["timestamp", "ch1", "ch2", "ch3", "ch4"]
     )
 
     result = transform_to_hz(fake_data)
 
     assert isinstance(result, pd.DataFrame)
-    assert list(result.columns) == ["delta", "theta", "alpha", "beta"]
+    assert list(result.columns) == ["timestamp", "delta", "theta", "alpha", "beta"]
 
 
 def test_transform_to_hz_small_input():
-    # Less than 256 rows → should return empty DataFrame
+    # Less than 256 rows, should return empty DataFrame
+    data = np.random.rand(100, 4)
+    timestamps = np.ones((100))
+    combined_data = np.hstack((timestamps, data))
+    
     small_data = pd.DataFrame(
-        np.random.rand(100, 4), columns=["ch1", "ch2", "ch3", "ch4"]
+        combined_data, columns=["timestamp", "ch1", "ch2", "ch3", "ch4"]
     )
 
     result = transform_to_hz(small_data)

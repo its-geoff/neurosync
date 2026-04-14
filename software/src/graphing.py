@@ -1,4 +1,4 @@
-"""graphing.py.
+"""graphing.py
 
 Graphs brainwave band data dynamically. Utilizes threading for parallel
 processing and visualization.
