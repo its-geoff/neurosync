@@ -13,6 +13,10 @@ import time
 from matplotlib.lines import Line2D
 from matplotlib.axes import Axes
 
+# module level constants
+BANDS = ["delta", "theta", "alpha", "beta"]
+WINDOW_SIZE = 50
+
 
 def create_figure():
     """Creates a graph to display the frequency of each brainwave type.
@@ -83,9 +87,7 @@ def run(fft_df: pd.DataFrame):
         
     Returns:
         None.
-    """
-    bands = ["delta", "theta", "alpha", "beta"]
-    
+    """    
     fig, ax, line_delta, line_theta, line_alpha, line_beta = create_figure()
     lines = [line_delta, line_theta, line_alpha, line_beta]
 
@@ -98,8 +100,9 @@ def run(fft_df: pd.DataFrame):
     while thread.is_alive():
         try:
             current_df = buffer.get_nowait()
-            for line, band, axis in zip(lines, bands, ax):
-                update_line(line, axis, current_df, band)
+            windowed_df = current_df.iloc[-WINDOW_SIZE:]
+            for line, band, axis in zip(lines, BANDS, ax):
+                update_line(line, axis, windowed_df, band)
             fig.canvas.draw()
             fig.canvas.flush_events()
         except queue.Empty:
