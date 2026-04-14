@@ -30,27 +30,8 @@ def _make_pylsl_stub():
     return pylsl
 
 
-# Stub serial and crcmod
-
-
-def _make_serial_stub():
-    serial = types.ModuleType("serial")
-    serial.Serial = MagicMock
-    return serial
-
-
-def _make_crcmod_stub():
-    crcmod = types.ModuleType("crcmod")
-    predefined = types.ModuleType("crcmod.predefined")
-    predefined.mkCrcFun = lambda name: (lambda data: 0x00)
-    crcmod.predefined = predefined
-    return crcmod
-
-
 sys.modules.setdefault("pylsl", _make_pylsl_stub())
-sys.modules.setdefault("serial", _make_serial_stub())
-sys.modules.setdefault("crcmod", _make_crcmod_stub())
-sys.modules.setdefault("crcmod.predefined", sys.modules["crcmod"].predefined)
+
 
 # Now safe to import
 import main  # noqa: E402
