@@ -167,8 +167,8 @@ def process_pipeline(df: pd.DataFrame):
 
 
 def run():
-    """Reads CSV EEG data, transforms it to frequency bands, prints sample data,
-    and calculates statistics.
+    """Reads CSV EEG data, transforms it to frequency bands, prints sample
+    data, and calculates statistics.
 
     Arguments:
         None.
