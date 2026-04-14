@@ -38,16 +38,15 @@ def create_figure():
 
     plt.tight_layout()
     plt.show()
-    return fig, ax, line_delta, line_theta, line_alpha, line_beta
+    return line_delta, line_theta, line_alpha, line_beta
 
 
-def update_line(line: Line2D, ax: Axes, fft_df: pd.DataFrame, band: str):
+def update_delta(line: Line2D, fft_df: pd.DataFrame):
     """Updates the current line on the graph.
 
     Arguments:
         line (Line2D): The line object for the delta wave graph.
-        fft_df (pandas.DataFrame): The formatted FFT data.
-        band (str): The column name of the brainwave band.
+        fft_df (pandas.DataFrame): The existing data.
 
     Returns:
         None.
