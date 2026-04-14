@@ -1,17 +1,18 @@
-"""graphing.py
+"""graphing.py.
 
-Graphs brainwave band data dynamically. Utilizes threading for parallel 
+Graphs brainwave band data dynamically. Utilizes threading for parallel
 processing and visualization.
 """
 
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-import threading
 import queue
+import threading
 import time
-from matplotlib.lines import Line2D
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from matplotlib.axes import Axes
+from matplotlib.lines import Line2D
 
 # module level constants
 BANDS = ["delta", "theta", "alpha", "beta"]
@@ -27,13 +28,13 @@ def create_figure():
     Returns:
         tuple [Line2D, ...]: Line objects that represent a brainwave frequency.
     """
-    plt.ion()   # turn on interactive mode
+    plt.ion()  # turn on interactive mode
     fig, ax = plt.subplots(4, 1)
-    line_delta, = ax[0].plot([], [])
-    line_theta, = ax[1].plot([], [])
-    line_alpha, = ax[2].plot([], [])
-    line_beta, = ax[3].plot([], [])
-    
+    (line_delta,) = ax[0].plot([], [])
+    (line_theta,) = ax[1].plot([], [])
+    (line_alpha,) = ax[2].plot([], [])
+    (line_beta,) = ax[3].plot([], [])
+
     plt.show()
     return fig, ax, line_delta, line_theta, line_alpha, line_beta
 
@@ -59,12 +60,12 @@ def update_line(line: Line2D, ax: Axes, fft_df: pd.DataFrame, band: str):
 
 def write_data(fft_df: pd.DataFrame, buffer: queue.Queue):
     """Writes FFT data into a shared buffer using threads for the render loop.
-    
+
     Arguments:
         fft_df (pd.DataFrame): The formatted FFT data.
-        buffer (queue.Queue): Shared buffer between this thread and the render 
+        buffer (queue.Queue): Shared buffer between this thread and the render
             loop.
-            
+
     Returns:
         None.
     """
@@ -79,22 +80,22 @@ def write_data(fft_df: pd.DataFrame, buffer: queue.Queue):
 
 
 def run(fft_df: pd.DataFrame):
-    """Creates a graph and constantly updates the graph when new data is
-    added.
-    
+    """Creates a graph and constantly updates the graph when new data is added.
+
     Arguments:
         fft_df (pandas.DataFrame): The formatted FFT data.
-        
+
     Returns:
         None.
-    """    
+    """
     fig, ax, line_delta, line_theta, line_alpha, line_beta = create_figure()
     lines = [line_delta, line_theta, line_alpha, line_beta]
 
     buffer = queue.Queue(maxsize=1)
 
-    thread = threading.Thread(target=write_data, args=(fft_df, buffer), 
-                              daemon=True)
+    thread = threading.Thread(
+        target=write_data, args=(fft_df, buffer), daemon=True
+    )
     thread.start()
 
     while thread.is_alive():
@@ -115,12 +116,14 @@ def run(fft_df: pd.DataFrame):
 
 
 if __name__ == "__main__":
-    fft_df = pd.DataFrame({
-        "timestamp": np.arange(100),
-        "delta": np.random.uniform(1, 100, 100),
-        "theta": np.random.uniform(1, 100, 100),
-        "alpha": np.random.uniform(1, 100, 100),
-        "beta":  np.random.uniform(1, 100, 100),
-    })
-    
+    fft_df = pd.DataFrame(
+        {
+            "timestamp": np.arange(100),
+            "delta": np.random.uniform(1, 100, 100),
+            "theta": np.random.uniform(1, 100, 100),
+            "alpha": np.random.uniform(1, 100, 100),
+            "beta": np.random.uniform(1, 100, 100),
+        }
+    )
+
     run(fft_df)

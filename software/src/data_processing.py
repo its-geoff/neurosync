@@ -1,5 +1,4 @@
-"""
-data_processing.py
+"""data_processing.py.
 
 Processes EEG data for Muse 2, including:
 - Reading CSV
@@ -13,6 +12,7 @@ import numpy as np
 import pandas as pd
 from scipy.fft import fft, fftfreq
 from tabulate import tabulate
+
 import graphing
 
 # global variables
@@ -165,10 +165,9 @@ def process_pipeline(df: pd.DataFrame):
     }
 
 
-
 def run():
-    """Reads CSV EEG data, transforms it to frequency bands, prints sample data,
-    and calculates statistics.
+    """Reads CSV EEG data, transforms it to frequency bands, prints sample
+    data, and calculates statistics.
 
     Arguments:
         None.
@@ -188,21 +187,7 @@ def run():
     # prints first five rows of readings, split by channel; sanity check
     df = pd.read_csv(file_path)  # CSV reading to pandas DataFrame
     result = process_pipeline(df)
-    # df_channels = df[["timestamp", "ch1", "ch2", "ch3", "ch4"]]
-    # print(
-    #     tabulate(
-    #         df_channels.head(),
-    #         headers="keys",
-    #         tablefmt="grid",
-    #         showindex=False,
-    #     )
-    # )
-    # data = transform_to_hz(df_channels)
 
-    # print(
-    #     tabulate(data.head(), headers="keys", tablefmt="grid", showindex=False)
-    # )
-    
     print("\n--- STATS ---")
     for key, value in result["stats"].items():
         print(f"\n{key}:\n{value}")
