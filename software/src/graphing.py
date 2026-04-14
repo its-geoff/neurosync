@@ -1,11 +1,15 @@
 """graphing.py
 
-Graphs brainwave band data dynamically.
+Graphs brainwave band data dynamically. Utilizes threading for parallel 
+processing and visualization.
 """
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import threading
+import queue
+import time
 from matplotlib.lines import Line2D
 from matplotlib.axes import Axes
 
@@ -30,34 +34,79 @@ def create_figure():
     return fig, ax, line_delta, line_theta, line_alpha, line_beta
 
 
-def update_delta(line: Line2D, ax: Axes, fft_df: pd.DataFrame):
+def update_line(line: Line2D, ax: Axes, fft_df: pd.DataFrame, band: str):
     """Updates the current line on the graph.
 
     Arguments:
         line (Line2D): The line object for the delta wave graph.
-        fft_df (pandas.DataFrame): The existing data.
+        fft_df (pandas.DataFrame): The formatted FFT data.
+        band (str): The column name of the brainwave band.
 
     Returns:
         None.
     """
     line.set_xdata(fft_df["timestamp"].values)
-    line.set_ydata(fft_df["delta"].values)
+    line.set_ydata(fft_df[band].values)
     ax.relim()
     ax.autoscale_view()
     line.figure.canvas.draw()
     line.figure.canvas.flush_events()
 
 
+def write_data(fft_df: pd.DataFrame, buffer: queue.Queue):
+    """Writes FFT data into a shared buffer using threads for the render loop.
+    
+    Arguments:
+        fft_df (pd.DataFrame): The formatted FFT data.
+        buffer (queue.Queue): Shared buffer between this thread and the render 
+            loop.
+            
+    Returns:
+        None.
+    """
+    for i in range(1, len(fft_df) + 1):
+        if not buffer.empty():
+            try:
+                buffer.get_nowait()  # discard stale frame
+            except queue.Empty:
+                pass
+        buffer.put(fft_df.iloc[:i])
+        time.sleep(0.1)
+
+
 def run(fft_df: pd.DataFrame):
     """Creates a graph and constantly updates the graph when new data is
-    added."""
-    fig, ax, line_delta, line_theta, line_alpha, line_beta = create_figure()
-    update_delta(line_delta, ax[0], fft_df)
+    added.
     
-    for i in range(1, len(fft_df) + 1):
-        update_delta(line_delta, ax[0], fft_df.iloc[:i])
-        plt.pause(0.1)
+    Arguments:
+        fft_df (pandas.DataFrame): The formatted FFT data.
         
+    Returns:
+        None.
+    """
+    bands = ["delta", "theta", "alpha", "beta"]
+    
+    fig, ax, line_delta, line_theta, line_alpha, line_beta = create_figure()
+    lines = [line_delta, line_theta, line_alpha, line_beta]
+
+    buffer = queue.Queue(maxsize=1)
+
+    thread = threading.Thread(target=write_data, args=(fft_df, buffer), 
+                              daemon=True)
+    thread.start()
+
+    while thread.is_alive():
+        try:
+            current_df = buffer.get_nowait()
+            for line, band, axis in zip(lines, bands, ax):
+                update_line(line, axis, current_df, band)
+            fig.canvas.draw()
+            fig.canvas.flush_events()
+        except queue.Empty:
+            pass
+
+        plt.pause(0.01)
+
     plt.ioff()  # turn off interactive mode
     plt.show()  # blocking commands until window closed
 
