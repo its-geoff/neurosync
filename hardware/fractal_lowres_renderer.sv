@@ -13,7 +13,7 @@ module fractal_lowres_renderer #(
     input  logic               px_active,
 
     // Fractal control parameters (Q4.28)
-    input  logic signed [31:0] zoom_q28,
+    input  logic signed [31:0] inv_zoom_q28,
     input  logic signed [31:0] center_re_q28,
     input  logic signed [31:0] center_im_q28,
     input  logic [15:0]        iter_limit,
@@ -25,12 +25,13 @@ module fractal_lowres_renderer #(
     output logic [3:0]         out_blue
 );
 
-    localparam FB_W    = H_VISIBLE / SCALE;   // 160
-    localparam FB_H    = V_VISIBLE / SCALE;   // 120
-    localparam FB_SIZE = FB_W * FB_H;         // 19200
+    localparam int FB_W    = H_VISIBLE / SCALE;
+    localparam int FB_H    = V_VISIBLE / SCALE;
+    localparam int FB_SIZE = FB_W * FB_H;
 
     // ============================================================
     // Low-res fractal pixel generator
+    // Runs directly on clk (which is now the real 25 MHz clock)
     // ============================================================
     logic [11:0] render_x, render_y;
     logic        render_req;
@@ -44,10 +45,11 @@ module fractal_lowres_renderer #(
     ) u_fractal_top (
         .clk           (clk),
         .rst_n         (rst_n),
+        .ce            (1'b1),           // no extra divide here
         .px_x          (render_x),
         .px_y          (render_y),
         .px_valid      (render_req),
-        .zoom_q28      (zoom_q28),
+        .inv_zoom_q28  (inv_zoom_q28),
         .center_re_q28 (center_re_q28),
         .center_im_q28 (center_im_q28),
         .iter_limit    (iter_limit),
@@ -75,7 +77,6 @@ module fractal_lowres_renderer #(
             fb_mem[fb_wr_addr] <= fb_wr_data;
     end
 
-    // synchronous read
     always_ff @(posedge clk) begin
         fb_rd_data <= fb_mem[fb_rd_addr];
     end
@@ -92,9 +93,7 @@ module fractal_lowres_renderer #(
 
     logic [11:0] cur_x, cur_y;
     logic [14:0] cur_addr;
-
-    // frame valid goes high after one complete low-res frame is rendered
-    logic frame_valid;
+    logic        frame_valid;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -146,7 +145,9 @@ module fractal_lowres_renderer #(
                     end
                 end
 
-                default: rstate <= R_IDLE;
+                default: begin
+                    rstate <= R_IDLE;
+                end
             endcase
         end
     end
@@ -158,9 +159,12 @@ module fractal_lowres_renderer #(
     logic [6:0] fb_y;
 
     always_comb begin
-        fb_x      = px_x[9:2];   // divide by 4
-        fb_y      = px_y[8:2];   // divide by 4
-        fb_rd_addr = fb_y * FB_W + fb_x;
+        fb_x = px_x[9:2];
+        fb_y = px_y[8:2];
+
+        // fb_rd_addr = fb_y * 160 + fb_x
+        // 160 = 128 + 32
+        fb_rd_addr = (fb_y << 7) + (fb_y << 5) + fb_x;
     end
 
     // ============================================================
@@ -177,7 +181,6 @@ module fractal_lowres_renderer #(
 
     // ============================================================
     // Output gating
-    // Do not show framebuffer until one complete frame is rendered
     // ============================================================
     assign out_red   = (px_active_d && frame_valid) ? fb_rd_data[11:8] : 4'd0;
     assign out_green = (px_active_d && frame_valid) ? fb_rd_data[7:4]  : 4'd0;
