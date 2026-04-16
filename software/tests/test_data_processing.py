@@ -27,8 +27,8 @@ def test_get_data_empty_string():
 
 def test_transform_to_hz_valid():
     # Create fake EEG data (256 rows, 4 channels)
-    data = np.random.rand(256, 4)
     timestamps = np.ones((256, 1))
+    data = np.random.rand(256, 4)
     combined_data = np.hstack((timestamps, data))
     
     fake_data = pd.DataFrame(
@@ -43,8 +43,8 @@ def test_transform_to_hz_valid():
 
 def test_transform_to_hz_small_input():
     # Less than 256 rows, should return empty DataFrame
+    timestamps = np.ones((100, 1))
     data = np.random.rand(100, 4)
-    timestamps = np.ones((100))
     combined_data = np.hstack((timestamps, data))
     
     small_data = pd.DataFrame(
