@@ -1,4 +1,4 @@
-"""data_processing.py
+"""data_processing.py.
 
 Processes EEG data for Muse 2, including:
 - Reading CSV
@@ -11,7 +11,6 @@ import os
 import numpy as np
 import pandas as pd
 from scipy.fft import fft, fftfreq
-from tabulate import tabulate
 
 import graphing
 

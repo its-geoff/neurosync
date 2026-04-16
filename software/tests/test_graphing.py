@@ -1,6 +1,5 @@
 import queue
 import threading
-import time
 from unittest.mock import MagicMock, call, patch
 
 import numpy as np
@@ -13,7 +12,8 @@ from graphing import BANDS, WINDOW_SIZE, update_line, write_data
 
 @pytest.fixture
 def sample_df():
-    """Minimal DataFrame that mirrors the shape write_data and update_line expect."""
+    """Minimal DataFrame that mirrors the shape write_data and update_line
+    expect."""
     n = 10
     return pd.DataFrame(
         {
@@ -73,7 +73,9 @@ class TestConstants:
 class TestUpdateLine:
     """update_line sets x/y data on the Line2D and triggers canvas refresh."""
 
-    def test_sets_xdata_to_timestamp_column(self, mock_line, mock_ax, sample_df):
+    def test_sets_xdata_to_timestamp_column(
+        self, mock_line, mock_ax, sample_df
+    ):
         update_line(mock_line, mock_ax, sample_df, "delta")
         np.testing.assert_array_equal(
             mock_line.set_xdata.call_args[0][0],
@@ -92,7 +94,9 @@ class TestUpdateLine:
         mock_ax.relim.assert_called_once()
         mock_ax.autoscale_view.assert_called_once()
 
-    def test_triggers_canvas_draw_and_flush(self, mock_line, mock_ax, sample_df):
+    def test_triggers_canvas_draw_and_flush(
+        self, mock_line, mock_ax, sample_df
+    ):
         update_line(mock_line, mock_ax, sample_df, "theta")
         mock_line.figure.canvas.draw.assert_called_once()
         mock_line.figure.canvas.flush_events.assert_called_once()
@@ -103,35 +107,44 @@ class TestUpdateLine:
         update_line(mock_line, mock_ax, sample_df, band)
         mock_line.set_ydata.assert_called_once()
 
-    def test_missing_band_raises_key_error(self, mock_line, mock_ax, sample_df):
-        """Passing an invalid band column should surface immediately as KeyError."""
+    def test_missing_band_raises_key_error(
+        self, mock_line, mock_ax, sample_df
+    ):
+        """Passing an invalid band column should surface immediately as
+        KeyError."""
         with pytest.raises(KeyError):
             update_line(mock_line, mock_ax, sample_df, "gamma")
 
 
 class TestWriteData:
-    """write_data populates a queue with incrementally growing DataFrame slices."""
+    """write_data populates a queue with incrementally growing DataFrame
+    slices."""
 
     @patch("graphing.time.sleep")
     def test_final_frame_is_complete(self, mock_sleep, sample_df):
-        """After write_data finishes, the queue must hold the final full-length frame.
+        """After write_data finishes, the queue must hold the final full-length
+        frame.
 
         The stale-frame-discard design means intermediate frames may be dropped
-        when the consumer is slower than the producer (or sleep is mocked to 0).
-        The only guarantee is that the last frame survives and is complete.
+        when the consumer is slower than the producer (or sleep is mocked to
+        0). The only guarantee is that the last frame survives and is complete.
         """
         buf = queue.Queue(maxsize=1)
         write_data(sample_df, buf)
 
-        assert not buf.empty(), "Queue must hold the final frame after write_data completes"
+        assert (
+            not buf.empty()
+        ), "Queue must hold the final frame after write_data completes"
         final_frame = buf.get_nowait()
-        assert len(final_frame) == len(sample_df), (
-            f"Final frame should have {len(sample_df)} rows, got {len(final_frame)}"
-        )
+        assert len(final_frame) == len(
+            sample_df
+        ), f"Final frame should have {len(sample_df)} rows, got \
+            {len(final_frame)}"
 
     @patch("graphing.time.sleep")
     def test_surviving_frame_is_cumulative_slice(self, mock_sleep, sample_df):
-        """The frame that survives is fft_df.iloc[:n] — a cumulative head slice.
+        """The frame that survives is fft_df.iloc[:n] — a cumulative head
+        slice.
 
         write_data intentionally discards stale frames, so with sleep mocked
         to 0 only the last frame is guaranteed to survive. What matters is that
@@ -152,10 +165,18 @@ class TestWriteData:
 
     @patch("graphing.time.sleep")
     def test_stale_frame_is_discarded(self, mock_sleep):
-        """If the queue is already full, write_data must discard before putting."""
+        """If the queue is already full, write_data must discard before
+        putting."""
         buf = queue.Queue(maxsize=1)
-        stale = pd.DataFrame({"timestamp": [0], "delta": [99],
-                              "theta": [99], "alpha": [99], "beta": [99]})
+        stale = pd.DataFrame(
+            {
+                "timestamp": [0],
+                "delta": [99],
+                "theta": [99],
+                "alpha": [99],
+                "beta": [99],
+            }
+        )
         buf.put(stale)  # pre-fill so the first put triggers discard logic
 
         fft_df = pd.DataFrame(
@@ -170,9 +191,12 @@ class TestWriteData:
 
         write_data(fft_df, buf)
 
-        # after completion, the queue should hold the last frame, not the stale one.
+        # after completion, the queue should hold the last frame, not the stale
+        # one.
         final = buf.get_nowait()
-        assert len(final) == 2, "Queue should hold the final 2-row frame, not stale data"
+        assert (
+            len(final) == 2
+        ), "Queue should hold the final 2-row frame, not stale data"
 
     @patch("graphing.time.sleep")
     def test_sleep_called_once_per_row(self, mock_sleep, sample_df):
@@ -215,7 +239,13 @@ class TestWriteData:
     @patch("graphing.time.sleep")
     def test_empty_dataframe_puts_nothing(self, mock_sleep):
         empty_df = pd.DataFrame(
-            {"timestamp": [], "delta": [], "theta": [], "alpha": [], "beta": []}
+            {
+                "timestamp": [],
+                "delta": [],
+                "theta": [],
+                "alpha": [],
+                "beta": [],
+            }
         )
         buf = queue.Queue(maxsize=1)
         write_data(empty_df, buf)
@@ -223,7 +253,8 @@ class TestWriteData:
 
 
 class TestCreateFigure:
-    """create_figure is tested with the matplotlib pyplot interface fully mocked."""
+    """create_figure is tested with the matplotlib pyplot interface fully
+    mocked."""
 
     @patch("graphing.plt")
     def test_returns_six_objects(self, mock_plt):
@@ -237,7 +268,9 @@ class TestCreateFigure:
         mock_plt.subplots.return_value = (mock_fig, mock_axes)
 
         result = graphing.create_figure()
-        assert len(result) == 6, "create_figure must return (fig, ax, l_d, l_t, l_a, l_b)"
+        assert (
+            len(result) == 6
+        ), "create_figure must return (fig, ax, l_d, l_t, l_a, l_b)"
 
     @patch("graphing.plt")
     def test_interactive_mode_enabled(self, mock_plt):
@@ -263,7 +296,8 @@ class TestCreateFigure:
 
 
 class TestWindowingBehavior:
-    """Verify the windowing slice applied inside run() produces the correct shape.
+    """Verify the windowing slice applied inside run() produces the correct
+    shape.
 
     run() itself is not unit-tested here because it owns the full render loop,
     but the windowing logic `current_df.iloc[-WINDOW_SIZE:]` is trivially
@@ -282,7 +316,8 @@ class TestWindowingBehavior:
         )
 
     def test_window_on_short_df_returns_full_df(self, sample_df):
-        """If df is shorter than WINDOW_SIZE, the window must not truncate it."""
+        """If df is shorter than WINDOW_SIZE, the window must not truncate
+        it."""
         assert len(sample_df) < WINDOW_SIZE
         windowed = sample_df.iloc[-WINDOW_SIZE:]
         assert len(windowed) == len(sample_df)

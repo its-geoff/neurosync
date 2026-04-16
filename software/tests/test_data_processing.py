@@ -30,7 +30,7 @@ def test_transform_to_hz_valid():
     timestamps = np.ones((256, 1))
     data = np.random.rand(256, 4)
     combined_data = np.hstack((timestamps, data))
-    
+
     fake_data = pd.DataFrame(
         combined_data, columns=["timestamp", "ch1", "ch2", "ch3", "ch4"]
     )
@@ -38,7 +38,13 @@ def test_transform_to_hz_valid():
     result = transform_to_hz(fake_data)
 
     assert isinstance(result, pd.DataFrame)
-    assert list(result.columns) == ["timestamp", "delta", "theta", "alpha", "beta"]
+    assert list(result.columns) == [
+        "timestamp",
+        "delta",
+        "theta",
+        "alpha",
+        "beta",
+    ]
 
 
 def test_transform_to_hz_small_input():
@@ -46,7 +52,7 @@ def test_transform_to_hz_small_input():
     timestamps = np.ones((100, 1))
     data = np.random.rand(100, 4)
     combined_data = np.hstack((timestamps, data))
-    
+
     small_data = pd.DataFrame(
         combined_data, columns=["timestamp", "ch1", "ch2", "ch3", "ch4"]
     )

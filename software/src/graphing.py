@@ -1,4 +1,4 @@
-"""graphing.py
+"""graphing.py.
 
 Graphs brainwave band data dynamically. Utilizes threading for parallel
 processing and visualization.
@@ -30,10 +30,10 @@ def create_figure():
     """
     plt.ion()  # turn on interactive mode
     fig, ax = plt.subplots(4, 1)
-    (line_delta,) = ax[0].plot([], [], color='green')
-    (line_theta,) = ax[1].plot([], [], color='red')
-    (line_alpha,) = ax[2].plot([], [], color='blue')
-    (line_beta,) = ax[3].plot([], [], color='purple')
+    (line_delta,) = ax[0].plot([], [], color="green")
+    (line_theta,) = ax[1].plot([], [], color="red")
+    (line_alpha,) = ax[2].plot([], [], color="blue")
+    (line_beta,) = ax[3].plot([], [], color="purple")
 
     plt.tight_layout()
     plt.show()
