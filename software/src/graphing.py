@@ -30,11 +30,12 @@ def create_figure():
     """
     plt.ion()  # turn on interactive mode
     fig, ax = plt.subplots(4, 1)
-    (line_delta,) = ax[0].plot([], [])
-    (line_theta,) = ax[1].plot([], [])
-    (line_alpha,) = ax[2].plot([], [])
-    (line_beta,) = ax[3].plot([], [])
+    (line_delta,) = ax[0].plot([], [], color='green')
+    (line_theta,) = ax[1].plot([], [], color='red')
+    (line_alpha,) = ax[2].plot([], [], color='blue')
+    (line_beta,) = ax[3].plot([], [], color='purple')
 
+    plt.tight_layout()
     plt.show()
     return fig, ax, line_delta, line_theta, line_alpha, line_beta
 
