@@ -47,8 +47,8 @@ jobs:
     - name: Format code
       run: |
         uv run black . --exclude "/(\.venv|\.git|__pycache__)/"
-        uv run isort . --skip .venv --skip .git --skip __pycache__
-        find src -name "*.py" -exec uv run --quiet docformatter --wrap-summaries 79 --wrap-descriptions 79 --in-place {} +
+        uv run isort .
+        find src -name "*.py" -exec uv run --quiet docformatter --wrap-summaries 79 --wrap-descriptions 79 --in-place {} + || true
 
     - name: Lint code
       run: uv run flake8 .
@@ -57,7 +57,7 @@ jobs:
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "style: auto-format with black, isort, and docformatter"
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.COMMIT_PAT }}
 
     - name: Run tests
       run: uv run pytest -v

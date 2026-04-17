@@ -17,17 +17,17 @@
 
 ## Problem Statement
 
-[2-3 sentences describing the problem you're solving and why it matters]
+Emotions are complex; students may have trouble comprehending their emotional state to mental health professionals. Traditional counseling oftentimes relies heavily on verbal communication and subjective observation, making it difficult to accurately gauge real time emotional and cognitive state.
 
 ## Solution
 
-[2-3 sentences describing your solution approach]
+NeuroSync addresses the problem by utilizing electroencephalogram (EEG) technology along with Field Programmable Gate Array (FPGA) based processing in order to interpret, visualize, and analyze emotional states concurrently. This product will enhance the quality of counseling sessions and leave students feeling more fulfilled after talking to mental health professionals. This system aims to ensure that counseling be responsive, accurate, and effective.
 
 ### Key Features
 
-- Feature 1
-- Feature 2
-- Feature 3
+- Real-time EEG signal acquisition and band power calculation
+- Hardware-accelerated brainwave visualization on FPGA
+- Multi-dimensional emotional state mapping (in progress)
 
 ---
 
@@ -54,6 +54,7 @@
 | Category | Technology |
 |----------|------------|
 | Language | SystemVerilog |
+| Communication Protocol | UART |
 | FPGA Board | Diligent Nexys A7-100T |
 | EEG headband | Muse 2 |
 
@@ -63,6 +64,7 @@
 | Language | Python 3.13.* |
 | Package Management | uv |
 | Signal Processing | SciPy, NumPy |
+| Data Formatting and Analysis | pandas |
 | Data I/O | pyserial, muselsl/pylsl |
 | Testing | PyTest |
 
@@ -146,6 +148,9 @@ Use clear, descriptive commit messages:
 - `Add user authentication endpoint`
 - `Fix database connection timeout issue`
 - `Update README with setup instructions`
+
+## Documentation
+- [Architecture](docs/architecture.md)
 
 ---
 

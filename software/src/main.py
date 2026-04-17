@@ -1,8 +1,16 @@
-import pandas as pd
+"""main.py.
+
+Streams EEG data from Muse 2 via LSL, computes band power features per window,
+and transmits each result over UART in real time.
+"""
+
+import os  # standard library
+
+import pandas as pd  # third-party
 import serial
 from pylsl import StreamInlet, resolve_streams
 
-import data_processing
+import data_processing  # local
 import transmission
 
 
@@ -17,6 +25,8 @@ def connect_and_process(ser: serial.Serial) -> None:
         None.
     """
     print("Resolving Muse 2 EEG stream...")
+    # Stream acquisition
+    # pylint: disable=unexpected-keyword-arg, too-many-function-args
     streams = resolve_streams("type", "EEG")
     inlet = StreamInlet(streams[0])
     print("Stream acquired. Beginning transmission. Press Ctrl+C to stop.")
@@ -32,7 +42,10 @@ def connect_and_process(ser: serial.Serial) -> None:
                 window_df = pd.DataFrame(
                     buffer[:256], columns=["ch1", "ch2", "ch3", "ch4"]
                 )
-                band_power_df = data_processing.transform_to_hz(window_df)
+                # change below:
+                # band_power_df = data_processing.transform_to_hz(window_df)
+                result = data_processing.process_pipeline(window_df)
+                band_power_df = result["frequency_data"]
 
                 for _, row in band_power_df.iterrows():
                     packet = transmission.df_to_packet(row)
@@ -45,10 +58,42 @@ def connect_and_process(ser: serial.Serial) -> None:
 
 
 def main():
-    # initializes serial and automatically cleans up after connection closed
-    # NOTE: change port before running
-    with serial.Serial(port="/dev/ttyUSB0", baudrate=115200, timeout=1) as ser:
-        connect_and_process(ser)
+    """Opens a UART serial connection and starts streaming and processing EEG
+    data."""
+    mode = input("Select mode (lsl / csv): ").strip().lower()
+
+    if mode == "lsl":
+        # NOTE: change port if needed for Windows (e.g., COM3)
+        with serial.Serial(port="COM3", baudrate=115200, timeout=1) as ser:
+            connect_and_process(ser)
+
+    elif mode == "csv":
+        file = input("Enter CSV file name (inside /data): ")
+
+        path = data_processing.get_data(file)
+
+        if not os.path.exists(path):
+            print("File not found")
+            return
+
+        df = pd.read_csv(path)
+
+        result = data_processing.process_pipeline(df)
+
+        print("\n--- STATS ---")
+        for key, value in result["stats"].items():
+            print(f"\n{key}:\n{value}")
+
+    else:
+        print("Invalid mode")
+
+
+# OG main function below
+# def main():
+# initializes serial and automatically cleans up after connection closed
+# NOTE: change port before running
+# with serial.Serial(port="/dev/ttyUSB0", baudrate=115200, timeout=1) as ser:
+# connect_and_process(ser)
 
 
 if __name__ == "__main__":

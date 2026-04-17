@@ -17,4 +17,8 @@ dist/
 build/
 
 # processed data
+.coverage
 data/processed.csv
+
+#vscode (repo clean)
+.vscode/
