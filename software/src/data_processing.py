@@ -84,8 +84,6 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
         )  # normalize by dividing by window size
         freqs = fftfreq(window_size, 1 / window_size)
 
-        print(window.columns)
-        print(signal_window.shape)
         # compute bands; square for band power
         delta_band = np.sum(abs(fft_vals[(freqs >= 0.5) & (freqs < 4)]) ** 2)
         theta_band = np.sum(abs(fft_vals[(freqs >= 4) & (freqs < 8)]) ** 2)
@@ -137,17 +135,15 @@ def get_stats(data):
 
     if data.empty:
         return None
-    
-    signals = data[["delta", "theta", "alpha", "beta"]]
 
     stats = {
-        "mean": signals.mean(),
-        "median": signals.median(),
-        "mode": signals.mode(),
-        "range": signals.max() - signals.min(),
-        "variance": signals.var(),
-        "std_dev": signals.std(),
-        "iqr": signals.quantile(0.75) - signals.quantile(0.25),
+        "mean": data.mean(),
+        "median": data.median(),
+        "mode": data.mode(),
+        "range": data.max() - data.min(),
+        "variance": data.var(),
+        "std_dev": data.std(),
+        "iqr": data.quantile(0.75) - data.quantile(0.25),
     }
 
     return stats
@@ -159,7 +155,8 @@ def process_pipeline(df: pd.DataFrame):
     raw EEG → FFT → stats
     """
     freq_data = transform_to_hz(df)
-    stats = get_stats(freq_data)
+    stats_data = freq_data.drop(columns=["timestamp"], errors="ignore")
+    stats = get_stats(stats_data)
     graphing.run(freq_data)
 
     return {
