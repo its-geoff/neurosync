@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pandas as pd
 
-
 #  _SampleInlet
 # A minimal LSL inlet stand-in. Returns one sample per pull_sample() call,
 # then raises KeyboardInterrupt to stop the while-True loop in main.py.
@@ -21,6 +20,7 @@ class _SampleInlet:
             return next(self._iter), None
         except StopIteration:
             raise KeyboardInterrupt
+
 
 # Stub pylsl before main.py is imported
 def _make_pylsl_stub():
@@ -82,8 +82,9 @@ def _patch_resolve():
 
 def _patch_fft(return_value=None):
     rv = (
-        pd.DataFrame([{"timestamp": 1, "delta": 1, "theta": 2, "alpha": 3, 
-                       "beta": 4}])
+        pd.DataFrame(
+            [{"timestamp": 1, "delta": 1, "theta": 2, "alpha": 3, "beta": 4}]
+        )
         if return_value is None
         else return_value
     )
@@ -96,6 +97,7 @@ def _patch_fft_side_effect(fn):
 
 def _patch_packet(return_value=b"\x00" * 12):
     return patch("main.transmission.df_to_packet", return_value=return_value)
+
 
 def _patch_graphing():
     return patch("data_processing.graphing.run")
@@ -167,8 +169,15 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
         def capture_fft(df):
             captured["arg"] = df
             return pd.DataFrame(
-                [{"timestamp": 1, "delta": 1, "theta": 2, "alpha": 3, 
-                  "beta": 4}]
+                [
+                    {
+                        "timestamp": 1,
+                        "delta": 1,
+                        "theta": 2,
+                        "alpha": 3,
+                        "beta": 4,
+                    }
+                ]
             )
 
         with (
@@ -191,8 +200,15 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
         def capture_fft(df):
             captured["shape"] = df.shape
             return pd.DataFrame(
-                [{"timestamp": 1, "delta": 1, "theta": 2, "alpha": 3, 
-                  "beta": 4}]
+                [
+                    {
+                        "timestamp": 1,
+                        "delta": 1,
+                        "theta": 2,
+                        "alpha": 3,
+                        "beta": 4,
+                    }
+                ]
             )
 
         with (
@@ -207,15 +223,22 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
         self.assertEqual(captured["shape"][0], 256)
 
     def test_fft_receives_timestamp_and_four_channel_columns(self):
-        """Window DataFrame must have a timestamp and 4 channel columns 
+        """Window DataFrame must have a timestamp and 4 channel columns
         (ch1–ch4)."""
         captured = {}
 
         def capture_fft(df):
             captured["cols"] = list(df.columns)
             return pd.DataFrame(
-                [{"timestamp": 1, "delta": 1, "theta": 2, "alpha": 3, 
-                  "beta": 4}]
+                [
+                    {
+                        "timestamp": 1,
+                        "delta": 1,
+                        "theta": 2,
+                        "alpha": 3,
+                        "beta": 4,
+                    }
+                ]
             )
 
         with (
@@ -227,8 +250,9 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
         ):
             main.connect_and_process(_make_fake_ser())
 
-        self.assertListEqual(captured["cols"], ["timestamp", "ch1", "ch2", 
-                                                "ch3", "ch4"])
+        self.assertListEqual(
+            captured["cols"], ["timestamp", "ch1", "ch2", "ch3", "ch4"]
+        )
 
     def test_samples_sliced_to_timestamp_plus_four_channels(self):
         """main.py does sample[:4] — fifth channel must not reach the
@@ -238,8 +262,15 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
         def capture_fft(df):
             captured["ncols"] = df.shape[1]
             return pd.DataFrame(
-                [{"timestamp": 1, "delta": 1, "theta": 2, "alpha": 3, 
-                  "beta": 4}]
+                [
+                    {
+                        "timestamp": 1,
+                        "delta": 1,
+                        "theta": 2,
+                        "alpha": 3,
+                        "beta": 4,
+                    }
+                ]
             )
 
         with (
@@ -269,8 +300,15 @@ class TestConnectAndProcessOverlap(unittest.TestCase):
         def counting_fft(df):
             call_count["n"] += 1
             return pd.DataFrame(
-                [{"timestamp": 1, "delta": 1, "theta": 2, "alpha": 3, 
-                  "beta": 4}]
+                [
+                    {
+                        "timestamp": 1,
+                        "delta": 1,
+                        "theta": 2,
+                        "alpha": 3,
+                        "beta": 4,
+                    }
+                ]
             )
 
         with (
@@ -299,8 +337,15 @@ class TestConnectAndProcessOverlap(unittest.TestCase):
         def counting_fft(df):
             call_count["n"] += 1
             return pd.DataFrame(
-                [{"timestamp": 1, "delta": 1, "theta": 2, "alpha": 3, 
-                  "beta": 4}]
+                [
+                    {
+                        "timestamp": 1,
+                        "delta": 1,
+                        "theta": 2,
+                        "alpha": 3,
+                        "beta": 4,
+                    }
+                ]
             )
 
         with (
@@ -325,10 +370,20 @@ class TestConnectAndProcessTransmission(unittest.TestCase):
         transform_to_hz."""
         fft_output = pd.DataFrame(
             [
-                {"timestamp": 1, "delta": 1, "theta": 2, "alpha": 3, 
-                 "beta": 4},
-                {"timestamp": 2, "delta": 5, "theta": 6, "alpha": 7, 
-                 "beta": 8},
+                {
+                    "timestamp": 1,
+                    "delta": 1,
+                    "theta": 2,
+                    "alpha": 3,
+                    "beta": 4,
+                },
+                {
+                    "timestamp": 2,
+                    "delta": 5,
+                    "theta": 6,
+                    "alpha": 7,
+                    "beta": 8,
+                },
             ]
         )
         ser = _make_fake_ser()
@@ -347,8 +402,15 @@ class TestConnectAndProcessTransmission(unittest.TestCase):
     def test_df_to_packet_called_for_each_row(self):
         """df_to_packet must be called once per FFT output row."""
         fft_output = pd.DataFrame(
-            [{"timestamp": 1, "delta": 10, "theta": 20, "alpha": 30, 
-              "beta": 40}]
+            [
+                {
+                    "timestamp": 1,
+                    "delta": 10,
+                    "theta": 20,
+                    "alpha": 30,
+                    "beta": 40,
+                }
+            ]
         )
 
         with (

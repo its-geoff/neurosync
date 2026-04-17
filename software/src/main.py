@@ -1,4 +1,4 @@
-"""main.py
+"""main.py.
 
 Streams EEG data from Muse 2 via LSL, computes band power features per window,
 and transmits each result over UART in real time.
@@ -41,8 +41,8 @@ def connect_and_process(ser: serial.Serial) -> None:
 
             if len(buffer) >= 256:  # window size
                 window_df = pd.DataFrame(
-                    buffer[:256], columns=["timestamp","ch1", "ch2", "ch3", 
-                                           "ch4"]
+                    buffer[:256],
+                    columns=["timestamp", "ch1", "ch2", "ch3", "ch4"],
                 )
                 # change below:
                 # band_power_df = data_processing.transform_to_hz(window_df)
