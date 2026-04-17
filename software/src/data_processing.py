@@ -6,7 +6,6 @@ Processes EEG data for Muse 2, including:
 - Statistical calculations
 """
 
-
 import os
 
 import numpy as np
