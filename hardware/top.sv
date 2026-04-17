@@ -20,9 +20,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module UART_RX_To_7_Seg_Top (
-    input  logic        i_Clock,       // 100 MHz board clock
-    input  logic        i_RX_Serial,   // UART RX
-    output logic        o_TX_Serial,   // UART TX loopback
+    input  logic        i_Clock,
+    input  logic        i_RX_Serial,
+    output logic        o_TX_Serial,
 
     output logic [6:0]  seg,
     output logic [7:0]  an,
@@ -30,7 +30,6 @@ module UART_RX_To_7_Seg_Top (
 
     output logic        LED0,
 
-    // VGA outputs
     output logic [3:0]  vgaRed,
     output logic [3:0]  vgaGreen,
     output logic [3:0]  vgaBlue,
@@ -39,9 +38,9 @@ module UART_RX_To_7_Seg_Top (
 );
 
     // ============================================================
-    // Power-on reset in 100 MHz domain
+    // Power-on reset
     // ============================================================
-    localparam int CLKS_PER_BIT = 868; // 100 MHz / 115200 ≈ 868
+    localparam int CLKS_PER_BIT = 868;
 
     logic [23:0] por_cnt = 24'd0;
     logic        reset   = 1'b1;
@@ -56,10 +55,9 @@ module UART_RX_To_7_Seg_Top (
     end
 
     // ============================================================
-    // 25 MHz clock generation
+    // Clock Wizard (100 MHz → 25 MHz)
     // ============================================================
-    logic clk_25;
-    logic clk_locked;
+    logic clk_25, clk_locked;
 
     clk_wiz_0 u_clk_wiz (
         .clk_in1  (i_Clock),
@@ -85,22 +83,20 @@ module UART_RX_To_7_Seg_Top (
     );
 
     // ============================================================
-    // UART TX loopback
+    // UART TX (loopback)
     // ============================================================
-    logic       tx_dv;
+    logic tx_dv, tx_active, tx_done;
     logic [7:0] tx_byte;
-    logic       tx_active;
-    logic       tx_done;
 
     always_ff @(posedge i_Clock) begin
         if (reset) begin
-            tx_dv   <= 1'b0;
-            tx_byte <= 8'd0;
+            tx_dv   <= 0;
+            tx_byte <= 0;
         end else begin
-            tx_dv <= 1'b0;
+            tx_dv <= 0;
             if (rx_dv && !tx_active) begin
                 tx_byte <= rx_byte;
-                tx_dv   <= 1'b1;
+                tx_dv   <= 1;
             end
         end
     end
@@ -115,11 +111,10 @@ module UART_RX_To_7_Seg_Top (
     );
 
     // ============================================================
-    // EEG packet parser (100 MHz domain)
+    // EEG Parser
     // ============================================================
     logic        packet_valid;
     logic [15:0] alpha, beta, theta, delta;
-    logic [7:0]  p_state, p_last, p_xor;
 
     EEG_Packet_Parser u_parser (
         .i_Clock        (i_Clock),
@@ -130,38 +125,35 @@ module UART_RX_To_7_Seg_Top (
         .o_Alpha        (alpha),
         .o_Beta         (beta),
         .o_Theta        (theta),
-        .o_Delta        (delta),
-        .o_State        (p_state),
-        .o_Last_Byte    (p_last),
-        .o_Check_Xor    (p_xor)
+        .o_Delta        (delta)
     );
 
     // ============================================================
-    // LED pulse on valid packet
+    // LED activity indicator
     // ============================================================
     logic [22:0] led_cnt;
 
     always_ff @(posedge i_Clock) begin
         if (reset) begin
-            led_cnt <= 23'd0;
+            led_cnt <= 0;
         end else begin
             if (packet_valid)
                 led_cnt <= 23'd1_000_000;
             else if (led_cnt != 0)
-                led_cnt <= led_cnt - 23'd1;
+                led_cnt <= led_cnt - 1;
         end
     end
 
     assign LED0 = (led_cnt != 0);
 
     // ============================================================
-    // 7-segment display shows alpha[7:0]
+    // 7-seg display (alpha)
     // ============================================================
     logic [7:0] display_byte_r;
 
     always_ff @(posedge i_Clock) begin
         if (reset)
-            display_byte_r <= 8'h00;
+            display_byte_r <= 0;
         else if (packet_valid)
             display_byte_r <= alpha[7:0];
     end
@@ -176,14 +168,14 @@ module UART_RX_To_7_Seg_Top (
     );
 
     // ============================================================
-    // EEG -> fractal parameter mapping (100 MHz domain)
+    // EEG → Fractal Mapping (RE-ENABLED, CLEANED)
     // ============================================================
-    localparam logic signed [31:0] Q28_ONE        = 32'sh1000_0000; // 1.0
-    localparam logic signed [31:0] Q28_HALF       = 32'sh0800_0000; // 0.5
-    localparam logic signed [31:0] Q28_TWO_THIRDS = 32'sh0AAA_AAAB; // ~0.6667
+
+    localparam logic signed [31:0] Q28_ONE  = 32'sh1000_0000;
+    localparam logic signed [31:0] Q28_HALF = 32'sh0800_0000;
 
     localparam logic signed [31:0] BASE_CENTER_RE = -32'sh0C00_0000; // -0.75
-    localparam logic signed [31:0] BASE_CENTER_IM =  32'sh0000_0000; // 0.0
+    localparam logic signed [31:0] BASE_CENTER_IM =  32'sh0000_0000;
 
     logic signed [31:0] inv_zoom_q28_100;
     logic signed [31:0] center_re_q28_100;
@@ -205,25 +197,35 @@ module UART_RX_To_7_Seg_Top (
             center_re_q28_100 <= BASE_CENTER_RE;
             center_im_q28_100 <= BASE_CENTER_IM;
             iter_limit_100    <= 16'd120;
-            palette_id_100    <= 8'd0;
+            palette_id_100    <= 0;
         end else if (packet_valid) begin
-            case (alpha[15:14])
-                2'b00: inv_zoom_q28_100 <= Q28_ONE;        // zoom = 1.0
-                2'b01: inv_zoom_q28_100 <= Q28_TWO_THIRDS; // zoom = 1.5
-                2'b10: inv_zoom_q28_100 <= Q28_HALF;       // zoom = 2.0
-                default: inv_zoom_q28_100 <= Q28_ONE;
-            endcase
 
-            iter_limit_100 <= 16'd64 + {8'd0, beta[15:8]};
-            center_re_q28_100 <= BASE_CENTER_RE + (theta_centered <<< 8);
-            center_im_q28_100 <= BASE_CENTER_IM + (delta_centered <<< 8);
-            palette_id_100 <= {6'd0, alpha[15:14]};
+            // Smooth inverse zoom from 1.0 down to ~0.5
+            // alpha = 0      -> inv_zoom = 1.0
+            // alpha = 65535  -> inv_zoom ≈ 0.5
+            inv_zoom_q28_100 <= Q28_ONE - ({16'd0, alpha} >>> 1);
+
+            // -------------------------------
+            // SMALL center movement (fixed)
+            // -------------------------------
+            center_re_q28_100 <= BASE_CENTER_RE + (theta_centered <<< 10);
+            center_im_q28_100 <= BASE_CENTER_IM + (delta_centered <<< 10);
+
+            // -------------------------------
+            // iteration range (safe)
+            // -------------------------------
+            iter_limit_100 <= 16'd80 + {8'd0, beta[15:9]};
+
+            // -------------------------------
+            // palette (few options)
+            // -------------------------------
+            palette_id_100 <= alpha[15:14];
+
         end
     end
 
     // ============================================================
-    // Cross parameters into 25 MHz VGA/fractal domain
-    // Simple two-stage register transfer
+    // Clock domain crossing
     // ============================================================
     logic signed [31:0] inv_zoom_q28_25_d1,  inv_zoom_q28_25;
     logic signed [31:0] center_re_q28_25_d1, center_re_q28_25;
@@ -239,10 +241,10 @@ module UART_RX_To_7_Seg_Top (
             center_re_q28_25    <= BASE_CENTER_RE;
             center_im_q28_25_d1 <= BASE_CENTER_IM;
             center_im_q28_25    <= BASE_CENTER_IM;
-            iter_limit_25_d1    <= 16'd120;
-            iter_limit_25       <= 16'd120;
-            palette_id_25_d1    <= 8'd0;
-            palette_id_25       <= 8'd0;
+            iter_limit_25_d1    <= 120;
+            iter_limit_25       <= 120;
+            palette_id_25_d1    <= 0;
+            palette_id_25       <= 0;
         end else begin
             inv_zoom_q28_25_d1  <= inv_zoom_q28_100;
             inv_zoom_q28_25     <= inv_zoom_q28_25_d1;
@@ -262,11 +264,11 @@ module UART_RX_To_7_Seg_Top (
     end
 
     // ============================================================
-    // VGA timing now runs directly on 25 MHz clock
+    // VGA + Fractal Renderer
     // ============================================================
-    logic        vga_active;
-    logic [9:0]  vga_x, vga_y;
-    logic        vga_hsync_raw, vga_vsync_raw;
+    logic vga_active;
+    logic [9:0] vga_x, vga_y;
+    logic vga_hsync_raw, vga_vsync_raw;
 
     VGA_640x480_Timing u_vga_timing (
         .i_Clock  (clk_25),
@@ -281,15 +283,7 @@ module UART_RX_To_7_Seg_Top (
     assign Hsync = vga_hsync_raw;
     assign Vsync = vga_vsync_raw;
 
-    // ============================================================
-    // Fractal renderer also runs on 25 MHz clock
-    // ============================================================
-    fractal_lowres_renderer #(
-        .H_VISIBLE (640),
-        .V_VISIBLE (480),
-        .SCALE     (4),
-        .MAX_ITER  (120)
-    ) u_fractal_renderer (
+    fractal_lowres_renderer u_renderer (
         .clk           (clk_25),
         .rst_n         (~reset_25),
         .px_x          (vga_x),
