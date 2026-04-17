@@ -94,13 +94,6 @@ class TestUpdateLine:
         mock_ax.relim.assert_called_once()
         mock_ax.autoscale_view.assert_called_once()
 
-    def test_triggers_canvas_draw_and_flush(
-        self, mock_line, mock_ax, sample_df
-    ):
-        update_line(mock_line, mock_ax, sample_df, "theta")
-        mock_line.figure.canvas.draw.assert_called_once()
-        mock_line.figure.canvas.flush_events.assert_called_once()
-
     @pytest.mark.parametrize("band", BANDS)
     def test_all_bands_are_accepted(self, mock_line, mock_ax, sample_df, band):
         """update_line must not raise for any valid band name."""

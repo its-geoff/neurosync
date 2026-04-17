@@ -12,21 +12,26 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
+from numpy.typing import NDArray
 
 # module level constants
 BANDS = ["delta", "theta", "alpha", "beta"]
 WINDOW_SIZE = 50
 
 
-def create_figure():
+def create_figure() -> (
+    tuple[Figure, NDArray[Axes], Line2D, Line2D, Line2D, Line2D]
+):
     """Creates a graph to display the frequency of each brainwave type.
 
     Arguments:
         None.
 
     Returns:
-        tuple [Line2D, ...]: Line objects that represent a brainwave frequency.
+        tuple [Figure, NDArray[Axes]l Line2D, Line2D, Line2D, Line2D]: The
+            figure, axis, and lines that represent a brainwave frequency.
     """
     print("Opening matplotlib...")
     plt.ion()  # turn on interactive mode
@@ -38,10 +43,10 @@ def create_figure():
 
     plt.tight_layout()
     plt.show()
-    return line_delta, line_theta, line_alpha, line_beta
+    return fig, ax, line_delta, line_theta, line_alpha, line_beta
 
 
-def update_delta(line: Line2D, fft_df: pd.DataFrame):
+def update_line(line: Line2D, ax: Axes, fft_df: pd.DataFrame, band: str):
     """Updates the current line on the graph.
 
     Arguments:
@@ -55,8 +60,6 @@ def update_delta(line: Line2D, fft_df: pd.DataFrame):
     line.set_ydata(fft_df[band].values)
     ax.relim()
     ax.autoscale_view()
-    line.figure.canvas.draw()
-    line.figure.canvas.flush_events()
 
 
 def write_data(fft_df: pd.DataFrame, buffer: queue.Queue):
