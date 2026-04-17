@@ -95,6 +95,9 @@ source .venv/bin/activate        # macOS / Linux
 
 # Install dependencies
 cd software/
+chmod +x scripts/*
+# Before the next step, make sure neurosync/software/scripts is added to PATH
+./install-liblsl
 uv sync
 ```
 

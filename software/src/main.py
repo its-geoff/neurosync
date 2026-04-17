@@ -76,7 +76,11 @@ def main():
             print("File not found")
             return
 
-        df = pd.read_csv(path)
+        try:
+            df = pd.read_csv(path)
+        except IsADirectoryError:
+            print("Invalid file name")
+            return
 
         result = data_processing.process_pipeline(df)
 
