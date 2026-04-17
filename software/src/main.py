@@ -1,4 +1,4 @@
-"""main.py.
+"""main.py
 
 Streams EEG data from Muse 2 via LSL, computes band power features per window,
 and transmits each result over UART in real time.
@@ -34,17 +34,20 @@ def connect_and_process(ser: serial.Serial) -> None:
     buffer = []
 
     try:
+        print("before loop")
         while True:
             sample, _ = inlet.pull_sample()
-            buffer.append(sample[:4])
+            buffer.append(sample[:5])
 
             if len(buffer) >= 256:  # window size
                 window_df = pd.DataFrame(
-                    buffer[:256], columns=["ch1", "ch2", "ch3", "ch4"]
+                    buffer[:256], columns=["timestamp","ch1", "ch2", "ch3", 
+                                           "ch4"]
                 )
                 # change below:
                 # band_power_df = data_processing.transform_to_hz(window_df)
                 result = data_processing.process_pipeline(window_df)
+                print("called")
                 band_power_df = result["frequency_data"]
 
                 for _, row in band_power_df.iterrows():
@@ -52,7 +55,7 @@ def connect_and_process(ser: serial.Serial) -> None:
                     ser.write(packet)
 
                 buffer = buffer[128:]  # 50% window overlap
-
+        print("after loop")
     except KeyboardInterrupt:
         print("Stream interrupted. Closing.")
 

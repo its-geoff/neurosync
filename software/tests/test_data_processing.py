@@ -27,7 +27,7 @@ def test_get_data_empty_string():
 
 def test_transform_to_hz_valid():
     # Create fake EEG data (256 rows, 4 channels)
-    timestamps = np.ones((256, 1))
+    timestamps = np.arange(0, 256, 1).reshape(256, 1)
     data = np.random.rand(256, 4)
     combined_data = np.hstack((timestamps, data))
 
@@ -49,7 +49,7 @@ def test_transform_to_hz_valid():
 
 def test_transform_to_hz_small_input():
     # Less than 256 rows, should return empty DataFrame
-    timestamps = np.ones((100, 1))
+    timestamps = np.arange(0, 100, 1).reshape(100, 1)
     data = np.random.rand(100, 4)
     combined_data = np.hstack((timestamps, data))
 
@@ -72,6 +72,7 @@ def test_transform_to_hz_invalid_input():
 def test_get_stats_valid():
     fake_data = pd.DataFrame(
         {
+            "timestamp": [1, 2, 3],
             "delta": [1, 2, 3],
             "theta": [2, 3, 4],
             "alpha": [3, 4, 5],
@@ -95,7 +96,8 @@ def test_get_stats_valid():
 
 
 def test_get_stats_empty():
-    empty_df = pd.DataFrame(columns=["delta", "theta", "alpha", "beta"])
+    empty_df = pd.DataFrame(columns=["timestamp", 
+                                     "delta", "theta", "alpha", "beta"])
     result = get_stats(empty_df)
     assert result is None
 

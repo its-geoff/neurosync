@@ -74,9 +74,11 @@ def write_data(fft_df: pd.DataFrame, buffer: queue.Queue):
         if not buffer.empty():
             try:
                 buffer.get_nowait()  # discard stale frame
+                print("GET")
             except queue.Empty:
                 pass
         buffer.put(fft_df.iloc[:i])
+        print("PUT", i)
         time.sleep(0.1)
 
 
