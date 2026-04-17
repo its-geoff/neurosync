@@ -20,9 +20,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module UART_RX_To_7_Seg_Top (
-    input  logic        i_Clock,       // E3 100 MHz
-    input  logic        i_RX_Serial,   // C4 UART RX
-    output logic        o_TX_Serial,   // D4 UART TX loopback
+    input  logic        i_Clock,
+    input  logic        i_RX_Serial,
+    output logic        o_TX_Serial,
 
     output logic [6:0]  seg,
     output logic [7:0]  an,
@@ -30,7 +30,6 @@ module UART_RX_To_7_Seg_Top (
 
     output logic        LED0,
 
-    // VGA outputs
     output logic [3:0]  vgaRed,
     output logic [3:0]  vgaGreen,
     output logic [3:0]  vgaBlue,
@@ -56,6 +55,21 @@ module UART_RX_To_7_Seg_Top (
     end
 
     // ============================================================
+    // Clock Wizard (100 MHz → 25 MHz)
+    // ============================================================
+    logic clk_25, clk_locked;
+
+    clk_wiz_0 u_clk_wiz (
+        .clk_in1  (i_Clock),
+        .reset    (reset),
+        .clk_out1 (clk_25),
+        .locked   (clk_locked)
+    );
+
+    logic reset_25;
+    assign reset_25 = reset | ~clk_locked;
+
+    // ============================================================
     // UART RX
     // ============================================================
     logic       rx_dv;
@@ -69,22 +83,20 @@ module UART_RX_To_7_Seg_Top (
     );
 
     // ============================================================
-    // UART TX loopback
+    // UART TX (loopback)
     // ============================================================
-    logic       tx_dv;
+    logic tx_dv, tx_active, tx_done;
     logic [7:0] tx_byte;
-    logic       tx_active;
-    logic       tx_done;
 
     always_ff @(posedge i_Clock) begin
         if (reset) begin
-            tx_dv   <= 1'b0;
-            tx_byte <= 8'd0;
+            tx_dv   <= 0;
+            tx_byte <= 0;
         end else begin
-            tx_dv <= 1'b0;
+            tx_dv <= 0;
             if (rx_dv && !tx_active) begin
                 tx_byte <= rx_byte;
-                tx_dv   <= 1'b1;
+                tx_dv   <= 1;
             end
         end
     end
@@ -99,11 +111,10 @@ module UART_RX_To_7_Seg_Top (
     );
 
     // ============================================================
-    // EEG packet parser
+    // EEG Parser
     // ============================================================
     logic        packet_valid;
     logic [15:0] alpha, beta, theta, delta;
-    logic [7:0]  p_state, p_last, p_xor;
 
     EEG_Packet_Parser u_parser (
         .i_Clock        (i_Clock),
@@ -114,38 +125,35 @@ module UART_RX_To_7_Seg_Top (
         .o_Alpha        (alpha),
         .o_Beta         (beta),
         .o_Theta        (theta),
-        .o_Delta        (delta),
-        .o_State        (p_state),
-        .o_Last_Byte    (p_last),
-        .o_Check_Xor    (p_xor)
+        .o_Delta        (delta)
     );
 
     // ============================================================
-    // LED pulse on valid packet
+    // LED activity indicator
     // ============================================================
     logic [22:0] led_cnt;
 
     always_ff @(posedge i_Clock) begin
         if (reset) begin
-            led_cnt <= 23'd0;
+            led_cnt <= 0;
         end else begin
             if (packet_valid)
                 led_cnt <= 23'd1_000_000;
             else if (led_cnt != 0)
-                led_cnt <= led_cnt - 23'd1;
+                led_cnt <= led_cnt - 1;
         end
     end
 
     assign LED0 = (led_cnt != 0);
 
     // ============================================================
-    // 7-segment display shows alpha[7:0]
+    // 7-seg display (alpha)
     // ============================================================
     logic [7:0] display_byte_r;
 
     always_ff @(posedge i_Clock) begin
         if (reset)
-            display_byte_r <= 8'h00;
+            display_byte_r <= 0;
         else if (packet_valid)
             display_byte_r <= alpha[7:0];
     end
@@ -160,37 +168,20 @@ module UART_RX_To_7_Seg_Top (
     );
 
     // ============================================================
-    // VGA timing stays here in top module
+    // EEG → Fractal Mapping (RE-ENABLED, CLEANED)
     // ============================================================
-    logic        vga_active;
-    logic [9:0]  vga_x, vga_y;
-    logic        vga_hsync_raw, vga_vsync_raw;
 
-    VGA_640x480_Timing u_vga_timing (
-        .i_Clock  (i_Clock),
-        .i_Reset  (reset),
-        .o_HSync  (vga_hsync_raw),
-        .o_VSync  (vga_vsync_raw),
-        .o_X      (vga_x),
-        .o_Y      (vga_y),
-        .o_Active (vga_active)
-    );
+    localparam logic signed [31:0] Q28_ONE  = 32'sh1000_0000;
+    localparam logic signed [31:0] Q28_HALF = 32'sh0800_0000;
 
-    assign Hsync = vga_hsync_raw;
-    assign Vsync = vga_vsync_raw;
-
-    // ============================================================
-    // EEG -> fractal parameter mapping (Q4.28)
-    // ============================================================
-    localparam logic signed [31:0] Q28_ONE        = 32'sh1000_0000; // 1.0
     localparam logic signed [31:0] BASE_CENTER_RE = -32'sh0C00_0000; // -0.75
-    localparam logic signed [31:0] BASE_CENTER_IM =  32'sh0000_0000; // 0.0
+    localparam logic signed [31:0] BASE_CENTER_IM =  32'sh0000_0000;
 
-    logic signed [31:0] zoom_q28;
-    logic signed [31:0] center_re_q28;
-    logic signed [31:0] center_im_q28;
-    logic [15:0]        iter_limit;
-    logic [7:0]         palette_id;
+    logic signed [31:0] inv_zoom_q28_100;
+    logic signed [31:0] center_re_q28_100;
+    logic signed [31:0] center_im_q28_100;
+    logic [15:0]        iter_limit_100;
+    logic [7:0]         palette_id_100;
 
     logic signed [16:0] theta_centered;
     logic signed [16:0] delta_centered;
@@ -202,48 +193,107 @@ module UART_RX_To_7_Seg_Top (
 
     always_ff @(posedge i_Clock) begin
         if (reset) begin
-            zoom_q28      <= Q28_ONE;
-            center_re_q28 <= BASE_CENTER_RE;
-            center_im_q28 <= BASE_CENTER_IM;
-            iter_limit    <= 16'd120;
-            palette_id    <= 8'd0;
+            inv_zoom_q28_100  <= Q28_ONE;
+            center_re_q28_100 <= BASE_CENTER_RE;
+            center_im_q28_100 <= BASE_CENTER_IM;
+            iter_limit_100    <= 16'd120;
+            palette_id_100    <= 0;
         end else if (packet_valid) begin
-            // Alpha -> zoom
-            zoom_q28 <= Q28_ONE + ({12'd0, alpha} << 12);
 
-            // Beta -> detail
-            iter_limit <= 16'd64 + {8'd0, beta[15:8]};
+            // Smooth inverse zoom from 1.0 down to ~0.5
+            // alpha = 0      -> inv_zoom = 1.0
+            // alpha = 65535  -> inv_zoom ≈ 0.5
+            inv_zoom_q28_100 <= Q28_ONE - ({16'd0, alpha} >>> 1);
 
-            // Theta -> horizontal drift
-            center_re_q28 <= BASE_CENTER_RE + (theta_centered <<< 8);
+            // -------------------------------
+            // SMALL center movement (fixed)
+            // -------------------------------
+            center_re_q28_100 <= BASE_CENTER_RE + (theta_centered <<< 10);
+            center_im_q28_100 <= BASE_CENTER_IM + (delta_centered <<< 10);
 
-            // Delta -> vertical drift
-            center_im_q28 <= BASE_CENTER_IM + (delta_centered <<< 8);
+            // -------------------------------
+            // iteration range (safe)
+            // -------------------------------
+            iter_limit_100 <= 16'd80 + {8'd0, beta[15:9]};
 
-            // Alpha -> palette select
-            palette_id <= {6'd0, alpha[15:14]};
+            // -------------------------------
+            // palette (few options)
+            // -------------------------------
+            palette_id_100 <= alpha[15:14];
+
         end
     end
 
     // ============================================================
-    // Fractal renderer (no timing inside)
+    // Clock domain crossing
     // ============================================================
-    fractal_lowres_renderer #(
-        .H_VISIBLE (640),
-        .V_VISIBLE (480),
-        .SCALE     (4),
-        .MAX_ITER  (120)
-    ) u_fractal_renderer (
-        .clk           (i_Clock),
-        .rst_n         (~reset),
+    logic signed [31:0] inv_zoom_q28_25_d1,  inv_zoom_q28_25;
+    logic signed [31:0] center_re_q28_25_d1, center_re_q28_25;
+    logic signed [31:0] center_im_q28_25_d1, center_im_q28_25;
+    logic [15:0]        iter_limit_25_d1,    iter_limit_25;
+    logic [7:0]         palette_id_25_d1,    palette_id_25;
+
+    always_ff @(posedge clk_25 or posedge reset_25) begin
+        if (reset_25) begin
+            inv_zoom_q28_25_d1  <= Q28_ONE;
+            inv_zoom_q28_25     <= Q28_ONE;
+            center_re_q28_25_d1 <= BASE_CENTER_RE;
+            center_re_q28_25    <= BASE_CENTER_RE;
+            center_im_q28_25_d1 <= BASE_CENTER_IM;
+            center_im_q28_25    <= BASE_CENTER_IM;
+            iter_limit_25_d1    <= 120;
+            iter_limit_25       <= 120;
+            palette_id_25_d1    <= 0;
+            palette_id_25       <= 0;
+        end else begin
+            inv_zoom_q28_25_d1  <= inv_zoom_q28_100;
+            inv_zoom_q28_25     <= inv_zoom_q28_25_d1;
+
+            center_re_q28_25_d1 <= center_re_q28_100;
+            center_re_q28_25    <= center_re_q28_25_d1;
+
+            center_im_q28_25_d1 <= center_im_q28_100;
+            center_im_q28_25    <= center_im_q28_25_d1;
+
+            iter_limit_25_d1    <= iter_limit_100;
+            iter_limit_25       <= iter_limit_25_d1;
+
+            palette_id_25_d1    <= palette_id_100;
+            palette_id_25       <= palette_id_25_d1;
+        end
+    end
+
+    // ============================================================
+    // VGA + Fractal Renderer
+    // ============================================================
+    logic vga_active;
+    logic [9:0] vga_x, vga_y;
+    logic vga_hsync_raw, vga_vsync_raw;
+
+    VGA_640x480_Timing u_vga_timing (
+        .i_Clock  (clk_25),
+        .i_Reset  (reset_25),
+        .o_HSync  (vga_hsync_raw),
+        .o_VSync  (vga_vsync_raw),
+        .o_X      (vga_x),
+        .o_Y      (vga_y),
+        .o_Active (vga_active)
+    );
+
+    assign Hsync = vga_hsync_raw;
+    assign Vsync = vga_vsync_raw;
+
+    fractal_lowres_renderer u_renderer (
+        .clk           (clk_25),
+        .rst_n         (~reset_25),
         .px_x          (vga_x),
         .px_y          (vga_y),
         .px_active     (vga_active),
-        .zoom_q28      (zoom_q28),
-        .center_re_q28 (center_re_q28),
-        .center_im_q28 (center_im_q28),
-        .iter_limit    (iter_limit),
-        .palette_id    (palette_id),
+        .inv_zoom_q28  (inv_zoom_q28_25),
+        .center_re_q28 (center_re_q28_25),
+        .center_im_q28 (center_im_q28_25),
+        .iter_limit    (iter_limit_25),
+        .palette_id    (palette_id_25),
         .out_red       (vgaRed),
         .out_green     (vgaGreen),
         .out_blue      (vgaBlue)
