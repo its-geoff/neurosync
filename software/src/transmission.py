@@ -43,8 +43,8 @@ def df_to_packet(row: pd.Series) -> bytes:
         bytes: A set of bytes in the form of a UART packet.
             [header][delta(u16)][theta(u16)][alpha(u16)][beta(u16)][crc8]
     """
-    row = row.clip(lower=0, upper=65535)
-    
+    row = row.clip(lower=0, upper=65535, inplace=True)
+
     print(f"delta: {int(row["delta"])}")
     print(f"theta: {int(row["theta"])}")
     print(f"alpha: {int(row["alpha"])}")
