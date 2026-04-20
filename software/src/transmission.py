@@ -46,7 +46,9 @@ def df_to_packet(row: pd.Series) -> bytes:
     # define header, payload, and checksum
     header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
     payload = struct.pack(
-        "HHHH", row["delta"], row["theta"], row["alpha"], row["beta"]
+        "HHHH", 
+        int(row["delta"]), int(row["theta"]), 
+        int(row["alpha"]), int(row["beta"])
     )
     checksum = crc8(payload)
 

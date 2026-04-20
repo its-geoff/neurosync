@@ -8,7 +8,7 @@ import os  # standard library
 
 import pandas as pd  # third-party
 import serial
-from pylsl import StreamInlet, resolve_streams
+from pylsl import StreamInlet, resolve_byprop
 
 import data_processing  # local
 import transmission
@@ -27,7 +27,7 @@ def connect_and_process(ser: serial.Serial) -> None:
     print("Resolving Muse 2 EEG stream...")
     # Stream acquisition
     # pylint: disable=unexpected-keyword-arg, too-many-function-args
-    streams = resolve_streams("type", "EEG")
+    streams = resolve_byprop("type", "EEG")
     inlet = StreamInlet(streams[0])
     print("Stream acquired. Beginning transmission. Press Ctrl+C to stop.")
 

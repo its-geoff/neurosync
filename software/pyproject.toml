@@ -8,7 +8,7 @@ dependencies = [
     "pandas",
     "scipy",
     "tabulate",
-    "pylsl",
+    "pylsl==1.17.6",
     "matplotlib",
     "crcmod>=1.7",
     "pytest>=9.0.2",
