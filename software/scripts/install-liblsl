@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -e
+
+echo "Building and installing liblsl from source..."
+sudo apt install -y cmake g++ git
+
+git clone https://github.com/sccn/liblsl.git /tmp/liblsl
+cd /tmp/liblsl
+mkdir build && cd build
+cmake ..
+cmake --build . --config Release
+sudo cmake --install .
+
+sudo ldconfig
+echo "liblsl installed to /usr/local/lib"

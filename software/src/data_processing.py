@@ -11,7 +11,8 @@ import os
 import numpy as np
 import pandas as pd
 from scipy.fft import fft, fftfreq
-from tabulate import tabulate
+
+import graphing
 
 # global variables
 FOLDER_NAME = os.path.abspath(os.path.join("..", "data"))
@@ -70,14 +71,16 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
     # 2/20/26 added input check to make sure it only runs on a pandas DataFrame
     window_size = 256  # sampling rate of Muse 2 headband
     step_size = 128  # 50% overlap between windows
-    columns = ["delta", "theta", "alpha", "beta"]  # FFT DataFrame columns
+    columns = ["timestamp", "delta", "theta", "alpha", "beta"]
+    signal_cols = ["ch1", "ch2", "ch3", "ch4"]
     fft_df = pd.DataFrame(columns=columns)  # define FFT DataFrame
 
     # FFT for all channels
     for start in range(0, len(data) - window_size + 1, step_size):
-        window = data[start : start + window_size]
+        window = data.iloc[start : start + window_size]
+        signal_window = window[signal_cols].values
         fft_vals = (
-            fft(window, axis=0) / window_size
+            fft(signal_window, axis=0) / window_size
         )  # normalize by dividing by window size
         freqs = fftfreq(window_size, 1 / window_size)
 
@@ -90,6 +93,7 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
         new_row = pd.DataFrame(
             [
                 {
+                    "timestamp": data["timestamp"].iloc[start],
                     "delta": float(delta_band),
                     "theta": float(theta_band),
                     "alpha": float(alpha_band),
@@ -145,9 +149,32 @@ def get_stats(data):
     return stats
 
 
+def process_pipeline(df: pd.DataFrame):
+    """
+    Full dynamic processing pipeline:
+    raw EEG → FFT → stats
+    """
+    freq_data = transform_to_hz(df)
+    stats_data = freq_data.drop(columns=["timestamp"], errors="ignore")
+    stats = get_stats(stats_data)
+    graphing.run(freq_data)
+
+    return {
+        "frequency_data": freq_data,
+        "stats": stats,
+    }
+
+
 def run():
     """Reads CSV EEG data, transforms it to frequency bands, prints sample
-    data, and calculates statistics."""
+    data, and calculates statistics.
+
+    Arguments:
+        None.
+
+    Returns:
+        None.
+    """
     # change to get_data(file) later with file being an arg in main
     file_path = get_data("muse2_eeg_data.csv")
     # path to data file
@@ -159,40 +186,12 @@ def run():
 
     # prints first five rows of readings, split by channel; sanity check
     df = pd.read_csv(file_path)  # CSV reading to pandas DataFrame
-    df_channels = df[["ch1", "ch2", "ch3", "ch4"]]
-    print(
-        tabulate(
-            df_channels.head(),
-            headers="keys",
-            tablefmt="grid",
-            showindex=False,
-        )
-    )
-    data = transform_to_hz(df_channels)
+    result = process_pipeline(df)
 
-    print(
-        tabulate(data.head(), headers="keys", tablefmt="grid", showindex=False)
-    )
-    get_stats(data)
+    print("\n--- STATS ---")
+    for key, value in result["stats"].items():
+        print(f"\n{key}:\n{value}")
 
 
 if __name__ == "__main__":
     run()
-
-
-def process_pipeline(df: pd.DataFrame):
-    """
-    Full dynamic processing pipeline:
-    raw EEG → FFT → stats
-    """
-    df = df.drop(columns=["timestamp"], errors="ignore")
-
-    df_channels = df[["ch1", "ch2", "ch3", "ch4"]]
-
-    freq_data = transform_to_hz(df_channels)
-    stats = get_stats(freq_data)
-
-    return {
-        "frequency_data": freq_data,
-        "stats": stats,
-    }

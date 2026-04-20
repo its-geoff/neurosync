@@ -24,6 +24,7 @@ dev = [
     "flake8-pyproject>=1.2.4",
     "isort>=7.0.0",
     "pytest-cov>=7.1.0",
+    "pytest-cov>=7.1.0",
     "safety>=3.7.0",
 ]
 
@@ -33,6 +34,10 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tests"]
 
 [tool.uv]
 package = true
@@ -53,3 +58,6 @@ skip = [".venv", ".git", "__pycache__"]
 [tool.black]
 line-length = 79
 target-version = ["py313"]
+
+[tool.pyright]
+ignore = ["**/*"]
