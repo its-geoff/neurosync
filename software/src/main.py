@@ -49,7 +49,7 @@ def connect_and_process(ser: serial.Serial) -> None:
 
                 for _, row in band_power_df.iterrows():
                     packet = transmission.df_to_packet(row)
-                    transmission.transmit(packet)
+                    transmission.transmit(packet, ser)
 
                 buffer = buffer[128:]  # 50% window overlap
 
