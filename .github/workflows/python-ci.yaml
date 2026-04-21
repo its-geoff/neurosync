@@ -61,6 +61,14 @@ jobs:
         uv run isort .
         find src -name "*.py" -exec uv run --quiet docformatter --wrap-summaries 79 --wrap-descriptions 79 --in-place {} + || true
 
+    - name: Debug pylsl lib
+          run: |
+            uv run python -c "
+            import pylsl.lib as lib
+            import os
+            print(os.listdir(os.path.dirname(lib.__file__)))
+            "
+
     - name: Lint code
       run: uv run flake8 .
 
