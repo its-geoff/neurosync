@@ -77,9 +77,7 @@ class TestLSLToUARTPipelineE2E:
     def test_keyboard_interrupt_exits_cleanly(self):
         ser = mock.MagicMock()
         with (
-            mock.patch(
-                "main.resolve_byprop", return_value=[mock.MagicMock()]
-            ),
+            mock.patch("main.resolve_byprop", return_value=[mock.MagicMock()]),
             mock.patch(
                 "main.StreamInlet", side_effect=lambda _: _FakeLSLInlet([])
             ),
