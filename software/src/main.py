@@ -37,18 +37,16 @@ def connect_and_process(ser: serial.Serial) -> None:
         print("before loop")
         while True:
             sample, _ = inlet.pull_sample()
-            buffer.append(sample[:5])
+            buffer.append(sample[:4])
 
             if len(buffer) >= 256:  # window size
                 window_df = pd.DataFrame(
                     buffer[:256],
-                    columns=["timestamp", "ch1", "ch2", "ch3", "ch4"],
+                    columns=["ch1", "ch2", "ch3", "ch4"],
                 )
                 # change below:
                 # band_power_df = data_processing.transform_to_hz(window_df)
-                result = data_processing.process_pipeline(window_df)
-                print("called")
-                band_power_df = result["frequency_data"]
+                band_power_df = data_processing.transform_to_hz(window_df)
 
                 for _, row in band_power_df.iterrows():
                     packet = transmission.df_to_packet(row)

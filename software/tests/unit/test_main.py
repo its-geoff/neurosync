@@ -6,30 +6,26 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pandas as pd
 
-#  _SampleInlet
-# A minimal LSL inlet stand-in. Returns one sample per pull_sample() call,
-# then raises KeyboardInterrupt to stop the while-True loop in main.py.
-
-
-class _SampleInlet:
-    def __init__(self, samples):
-        self._iter = iter(samples)
-
-    def pull_sample(self):
-        try:
-            return next(self._iter), None
-        except StopIteration:
-            raise KeyboardInterrupt
-
 
 # Stub pylsl before main.py is imported
 def _make_pylsl_stub():
     pylsl = types.ModuleType("pylsl")
 
+    class FakeInlet:
+        def __init__(self, samples):
+            # samples is a list of 4-element lists
+            self._samples = iter(samples)
+
+        def pull_sample(self):
+            try:
+                return next(self._samples), None
+            except StopIteration:
+                raise KeyboardInterrupt  # stop the loop when samples run out
+
     def resolve_streams(stream_type, stream_name):
         return [MagicMock()]  # return one fake stream
 
-    pylsl.StreamInlet = _SampleInlet
+    pylsl.StreamInlet = FakeInlet
     pylsl.resolve_streams = resolve_streams
     return pylsl
 
@@ -46,10 +42,8 @@ import main  # noqa: E402
 def _fake_samples(n: int) -> list:
     """Generate n fake EEG samples, each with 5 channels (main.py slices
     [:4])."""
-    timestamps = np.arange(0, n, 1).reshape(n, 1)
-    data = np.random.rand(n, 4)
-    combined = np.hstack((timestamps, data))
-    return combined.tolist()
+    rng = np.random.default_rng(0)
+    return rng.standard_normal((n, 5)).tolist()
 
 
 def _make_fake_ser():
@@ -82,9 +76,7 @@ def _patch_resolve():
 
 def _patch_fft(return_value=None):
     rv = (
-        pd.DataFrame(
-            [{"timestamp": 1, "delta": 1, "theta": 2, "alpha": 3, "beta": 4}]
-        )
+        pd.DataFrame([{"delta": 1, "theta": 2, "alpha": 3, "beta": 4}])
         if return_value is None
         else return_value
     )
@@ -99,10 +91,6 @@ def _patch_packet(return_value=b"\x00" * 12):
     return patch("main.transmission.df_to_packet", return_value=return_value)
 
 
-def _patch_graphing():
-    return patch("data_processing.graphing.run")
-
-
 class TestConnectAndProcessBuffering(unittest.TestCase):
     """Tests that the buffer fills correctly and triggers at the right time."""
 
@@ -112,7 +100,6 @@ class TestConnectAndProcessBuffering(unittest.TestCase):
         with (
             _patch_resolve(),
             _patch_inlet(_fake_samples(255)),
-            _patch_graphing(),
             patch("main.data_processing.transform_to_hz") as mock_fft,
         ):
             main.connect_and_process(_make_fake_ser())
@@ -125,7 +112,6 @@ class TestConnectAndProcessBuffering(unittest.TestCase):
             _patch_inlet(_fake_samples(256)),
             _patch_fft() as mock_fft,
             _patch_packet(),
-            _patch_graphing(),
         ):
             main.connect_and_process(_make_fake_ser())
         mock_fft.assert_called_once()
@@ -141,7 +127,6 @@ class TestConnectAndProcessBuffering(unittest.TestCase):
             _patch_inlet(_fake_samples(384)),
             _patch_fft() as mock_fft,
             _patch_packet(),
-            _patch_graphing(),
         ):
             main.connect_and_process(_make_fake_ser())
         self.assertEqual(mock_fft.call_count, 2)
@@ -153,7 +138,6 @@ class TestConnectAndProcessBuffering(unittest.TestCase):
             _patch_inlet(_fake_samples(512)),
             _patch_fft() as mock_fft,
             _patch_packet(),
-            _patch_graphing(),
         ):
             main.connect_and_process(_make_fake_ser())
         self.assertEqual(mock_fft.call_count, 3)
@@ -169,15 +153,7 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
         def capture_fft(df):
             captured["arg"] = df
             return pd.DataFrame(
-                [
-                    {
-                        "timestamp": 1,
-                        "delta": 1,
-                        "theta": 2,
-                        "alpha": 3,
-                        "beta": 4,
-                    }
-                ]
+                [{"delta": 1, "theta": 2, "alpha": 3, "beta": 4}]
             )
 
         with (
@@ -185,7 +161,6 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
             _patch_inlet(_fake_samples(256)),
             _patch_fft_side_effect(capture_fft),
             _patch_packet(),
-            _patch_graphing(),
         ):
             main.connect_and_process(_make_fake_ser())
 
@@ -200,15 +175,7 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
         def capture_fft(df):
             captured["shape"] = df.shape
             return pd.DataFrame(
-                [
-                    {
-                        "timestamp": 1,
-                        "delta": 1,
-                        "theta": 2,
-                        "alpha": 3,
-                        "beta": 4,
-                    }
-                ]
+                [{"delta": 1, "theta": 2, "alpha": 3, "beta": 4}]
             )
 
         with (
@@ -216,29 +183,19 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
             _patch_inlet(_fake_samples(256)),
             _patch_fft_side_effect(capture_fft),
             _patch_packet(),
-            _patch_graphing(),
         ):
             main.connect_and_process(_make_fake_ser())
 
         self.assertEqual(captured["shape"][0], 256)
 
-    def test_fft_receives_timestamp_and_four_channel_columns(self):
-        """Window DataFrame must have a timestamp and 4 channel columns
-        (ch1–ch4)."""
+    def test_fft_receives_four_channel_columns(self):
+        """Window DataFrame must have exactly 4 columns (ch1–ch4)."""
         captured = {}
 
         def capture_fft(df):
             captured["cols"] = list(df.columns)
             return pd.DataFrame(
-                [
-                    {
-                        "timestamp": 1,
-                        "delta": 1,
-                        "theta": 2,
-                        "alpha": 3,
-                        "beta": 4,
-                    }
-                ]
+                [{"delta": 1, "theta": 2, "alpha": 3, "beta": 4}]
             )
 
         with (
@@ -246,15 +203,12 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
             _patch_inlet(_fake_samples(256)),
             _patch_fft_side_effect(capture_fft),
             _patch_packet(),
-            _patch_graphing(),
         ):
             main.connect_and_process(_make_fake_ser())
 
-        self.assertListEqual(
-            captured["cols"], ["timestamp", "ch1", "ch2", "ch3", "ch4"]
-        )
+        self.assertListEqual(captured["cols"], ["ch1", "ch2", "ch3", "ch4"])
 
-    def test_samples_sliced_to_timestamp_plus_four_channels(self):
+    def test_samples_sliced_to_four_channels(self):
         """main.py does sample[:4] — fifth channel must not reach the
         window."""
         captured = {}
@@ -262,15 +216,7 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
         def capture_fft(df):
             captured["ncols"] = df.shape[1]
             return pd.DataFrame(
-                [
-                    {
-                        "timestamp": 1,
-                        "delta": 1,
-                        "theta": 2,
-                        "alpha": 3,
-                        "beta": 4,
-                    }
-                ]
+                [{"delta": 1, "theta": 2, "alpha": 3, "beta": 4}]
             )
 
         with (
@@ -278,11 +224,10 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
             _patch_inlet(_fake_samples(256)),
             _patch_fft_side_effect(capture_fft),
             _patch_packet(),
-            _patch_graphing(),
         ):
             main.connect_and_process(_make_fake_ser())
 
-        self.assertEqual(captured["ncols"], 5)
+        self.assertEqual(captured["ncols"], 4)
 
 
 class TestConnectAndProcessOverlap(unittest.TestCase):
@@ -300,15 +245,7 @@ class TestConnectAndProcessOverlap(unittest.TestCase):
         def counting_fft(df):
             call_count["n"] += 1
             return pd.DataFrame(
-                [
-                    {
-                        "timestamp": 1,
-                        "delta": 1,
-                        "theta": 2,
-                        "alpha": 3,
-                        "beta": 4,
-                    }
-                ]
+                [{"delta": 1, "theta": 2, "alpha": 3, "beta": 4}]
             )
 
         with (
@@ -316,7 +253,6 @@ class TestConnectAndProcessOverlap(unittest.TestCase):
             _patch_inlet(_fake_samples(384)),
             _patch_fft_side_effect(counting_fft),
             _patch_packet(),
-            _patch_graphing(),
         ):
             main.connect_and_process(_make_fake_ser())
 
@@ -337,15 +273,7 @@ class TestConnectAndProcessOverlap(unittest.TestCase):
         def counting_fft(df):
             call_count["n"] += 1
             return pd.DataFrame(
-                [
-                    {
-                        "timestamp": 1,
-                        "delta": 1,
-                        "theta": 2,
-                        "alpha": 3,
-                        "beta": 4,
-                    }
-                ]
+                [{"delta": 1, "theta": 2, "alpha": 3, "beta": 4}]
             )
 
         with (
@@ -353,7 +281,6 @@ class TestConnectAndProcessOverlap(unittest.TestCase):
             _patch_inlet(_fake_samples(383)),
             _patch_fft_side_effect(counting_fft),
             _patch_packet(),
-            _patch_graphing(),
         ):
             main.connect_and_process(_make_fake_ser())
 
@@ -370,20 +297,8 @@ class TestConnectAndProcessTransmission(unittest.TestCase):
         transform_to_hz."""
         fft_output = pd.DataFrame(
             [
-                {
-                    "timestamp": 1,
-                    "delta": 1,
-                    "theta": 2,
-                    "alpha": 3,
-                    "beta": 4,
-                },
-                {
-                    "timestamp": 2,
-                    "delta": 5,
-                    "theta": 6,
-                    "alpha": 7,
-                    "beta": 8,
-                },
+                {"delta": 1, "theta": 2, "alpha": 3, "beta": 4},
+                {"delta": 5, "theta": 6, "alpha": 7, "beta": 8},
             ]
         )
         ser = _make_fake_ser()
@@ -393,7 +308,6 @@ class TestConnectAndProcessTransmission(unittest.TestCase):
             _patch_inlet(_fake_samples(256)),
             _patch_fft(return_value=fft_output),
             _patch_packet(b"\xaa" * 12),
-            _patch_graphing(),
         ):
             main.connect_and_process(ser)
 
@@ -402,22 +316,13 @@ class TestConnectAndProcessTransmission(unittest.TestCase):
     def test_df_to_packet_called_for_each_row(self):
         """df_to_packet must be called once per FFT output row."""
         fft_output = pd.DataFrame(
-            [
-                {
-                    "timestamp": 1,
-                    "delta": 10,
-                    "theta": 20,
-                    "alpha": 30,
-                    "beta": 40,
-                }
-            ]
+            [{"delta": 10, "theta": 20, "alpha": 30, "beta": 40}]
         )
 
         with (
             _patch_resolve(),
             _patch_inlet(_fake_samples(256)),
             _patch_fft(return_value=fft_output),
-            _patch_graphing(),
             patch(
                 "main.transmission.df_to_packet", return_value=b"\x00" * 12
             ) as mock_packet,
@@ -437,7 +342,6 @@ class TestConnectAndProcessTransmission(unittest.TestCase):
             _patch_inlet(_fake_samples(256)),
             _patch_fft(),
             _patch_packet(expected_packet),
-            _patch_graphing(),
         ):
             main.connect_and_process(ser)
 
@@ -450,7 +354,6 @@ class TestConnectAndProcessTransmission(unittest.TestCase):
         with (
             _patch_resolve(),
             _patch_inlet(_fake_samples(100)),
-            _patch_graphing(),
             patch("main.data_processing.transform_to_hz") as mock_fft,
         ):
             main.connect_and_process(ser)
@@ -485,6 +388,22 @@ class TestConnectAndProcessShutdown(unittest.TestCase):
             main.connect_and_process(_make_fake_ser())
 
         mock_fft.assert_not_called()
+
+
+#  _SampleInlet
+# A minimal LSL inlet stand-in. Returns one sample per pull_sample() call,
+# then raises KeyboardInterrupt to stop the while-True loop in main.py.
+
+
+class _SampleInlet:
+    def __init__(self, samples):
+        self._iter = iter(samples)
+
+    def pull_sample(self):
+        try:
+            return next(self._iter), None
+        except StopIteration:
+            raise KeyboardInterrupt
 
 
 #  Run
