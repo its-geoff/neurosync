@@ -7,13 +7,14 @@ import unittest.mock as mock
 
 import numpy as np
 import pandas as pd
-import pytest
 
 import transmission
 
 
 def make_band_power_row(delta=1000, theta=2000, alpha=3000, beta=4000):
-    return pd.Series({"delta": delta, "theta": theta, "alpha": alpha, "beta": beta})
+    return pd.Series(
+        {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
+    )
 
 
 def make_band_power_df(n_rows=4, seed=0):
@@ -41,9 +42,13 @@ class TestPacketRoundTripIntegration:
 
     def test_round_trip_boundary_values(self):
         for val in [0, 1, 127, 128, 255, 256, 32767, 32768, 65534, 65535]:
-            row = make_band_power_row(delta=val, theta=val, alpha=val, beta=val)
+            row = make_band_power_row(
+                delta=val, theta=val, alpha=val, beta=val
+            )
             packet = transmission.df_to_packet(row)
-            assert transmission.validate_packet(packet), f"validate failed for val={val}"
+            assert transmission.validate_packet(
+                packet
+            ), f"validate failed for val={val}"
 
             mock_ser = mock.MagicMock()
             mock_ser.read.return_value = packet
@@ -55,8 +60,12 @@ class TestPacketRoundTripIntegration:
         df = make_band_power_df(n_rows=5)
         packets = [transmission.df_to_packet(row) for _, row in df.iterrows()]
 
-        for i, (packet, (_, original_row)) in enumerate(zip(packets, df.iterrows())):
-            assert transmission.validate_packet(packet), f"invalid packet at row {i}"
+        for i, (packet, (_, original_row)) in enumerate(
+            zip(packets, df.iterrows())
+        ):
+            assert transmission.validate_packet(
+                packet
+            ), f"invalid packet at row {i}"
             mock_ser = mock.MagicMock()
             mock_ser.read.return_value = packet
             recovered = transmission.packet_to_df(mock_ser)

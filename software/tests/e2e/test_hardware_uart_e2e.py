@@ -28,7 +28,10 @@ class TestHardwareUARTLoopbackE2E:
     @requires_hardware
     def test_single_packet_loopback(self):
         import serial
-        row = pd.Series({"delta": 1000, "theta": 2000, "alpha": 3000, "beta": 4000})
+
+        row = pd.Series(
+            {"delta": 1000, "theta": 2000, "alpha": 3000, "beta": 4000}
+        )
         packet = transmission.df_to_packet(row)
 
         with serial.Serial(SERIAL_PORT, baudrate=115200, timeout=2) as ser:
@@ -43,10 +46,13 @@ class TestHardwareUARTLoopbackE2E:
     @requires_hardware
     def test_multiple_packets_loopback_round_trip(self):
         import serial
-        df = pd.DataFrame([
-            {"delta": 100, "theta": 200, "alpha": 300, "beta": 400},
-            {"delta": 500, "theta": 600, "alpha": 700, "beta": 800},
-        ])
+
+        df = pd.DataFrame(
+            [
+                {"delta": 100, "theta": 200, "alpha": 300, "beta": 400},
+                {"delta": 500, "theta": 600, "alpha": 700, "beta": 800},
+            ]
+        )
         packets = [transmission.df_to_packet(row) for _, row in df.iterrows()]
 
         with serial.Serial(SERIAL_PORT, baudrate=115200, timeout=2) as ser:
@@ -61,9 +67,12 @@ class TestHardwareUARTLoopbackE2E:
     @requires_hardware
     def test_hardware_packet_rate_at_50hz(self):
         import serial
+
         n_packets = 50
         interval = 1.0 / 50
-        row = pd.Series({"delta": 1000, "theta": 2000, "alpha": 3000, "beta": 4000})
+        row = pd.Series(
+            {"delta": 1000, "theta": 2000, "alpha": 3000, "beta": 4000}
+        )
         packet = transmission.df_to_packet(row)
 
         start = time.monotonic()
@@ -73,4 +82,6 @@ class TestHardwareUARTLoopbackE2E:
                 time.sleep(interval)
         elapsed = time.monotonic() - start
 
-        assert elapsed < 2.5, f"50-packet burst took {elapsed:.2f}s, expected ~1s"
+        assert (
+            elapsed < 2.5
+        ), f"50-packet burst took {elapsed:.2f}s, expected ~1s"

@@ -5,7 +5,6 @@ Documents the known checksum mismatch between the FPGA XOR scheme and the
 Python CRC-8 scheme.
 """
 
-
 import pandas as pd
 import pytest
 
@@ -17,11 +16,11 @@ def build_fpga_packet(alpha, beta, theta, delta):
     Checksum is XOR of LEN byte and all 8 payload bytes.
     """
     alpha = max(0, min(0xFFFF, alpha))
-    beta  = max(0, min(0xFFFF, beta))
+    beta = max(0, min(0xFFFF, beta))
     theta = max(0, min(0xFFFF, theta))
     delta = max(0, min(0xFFFF, delta))
     a_hi, a_lo = (alpha >> 8) & 0xFF, alpha & 0xFF
-    b_hi, b_lo = (beta  >> 8) & 0xFF, beta  & 0xFF
+    b_hi, b_lo = (beta >> 8) & 0xFF, beta & 0xFF
     t_hi, t_lo = (theta >> 8) & 0xFF, theta & 0xFF
     d_hi, d_lo = (delta >> 8) & 0xFF, delta & 0xFF
     payload = [a_hi, a_lo, b_hi, b_lo, t_hi, t_lo, d_hi, d_lo]
@@ -34,17 +33,23 @@ def build_fpga_packet(alpha, beta, theta, delta):
 class TestFPGAPacketFormatE2E:
 
     def test_fpga_packet_is_12_bytes(self):
-        pkt = build_fpga_packet(alpha=10000, beta=20000, theta=30000, delta=40000)
+        pkt = build_fpga_packet(
+            alpha=10000, beta=20000, theta=30000, delta=40000
+        )
         assert len(pkt) == 12
 
     def test_fpga_packet_sync_bytes_match_python_constants(self):
-        pkt = build_fpga_packet(alpha=10000, beta=20000, theta=30000, delta=40000)
+        pkt = build_fpga_packet(
+            alpha=10000, beta=20000, theta=30000, delta=40000
+        )
         assert pkt[0] == transmission.SYNC_BYTE_1
         assert pkt[1] == transmission.SYNC_BYTE_2
         assert pkt[2] == transmission.PAYLOAD_LENGTH
 
     def test_python_packet_sync_bytes_match_fpga_expectations(self):
-        row = pd.Series({"delta": 40000, "theta": 30000, "alpha": 10000, "beta": 20000})
+        row = pd.Series(
+            {"delta": 40000, "theta": 30000, "alpha": 10000, "beta": 20000}
+        )
         pkt = transmission.df_to_packet(row)
         assert pkt[0] == 0xAA
         assert pkt[1] == 0x55
@@ -55,14 +60,21 @@ class TestFPGAPacketFormatE2E:
         bytes. Only the final checksum byte differs due to algorithm mismatch
         (FPGA uses XOR, Python uses CRC-8). Any hardware fix must align these.
         """
-        pytest.skip("Pending hardware update: FPGA must align byte order and checksum algorithm with Python")
+        pytest.skip(
+            "Pending hardware update: FPGA must align byte order and checksum"
+            " algorithm with Python"
+        )
         alpha, beta, theta, delta = 1000, 2000, 3000, 4000
         fpga_pkt = build_fpga_packet(alpha, beta, theta, delta)
 
-        row = pd.Series({"delta": delta, "theta": theta, "alpha": alpha, "beta": beta})
+        row = pd.Series(
+            {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
+        )
         py_pkt = transmission.df_to_packet(row)
 
-        assert fpga_pkt[:11] == py_pkt[:11], "header/payload bytes do not match"
+        assert (
+            fpga_pkt[:11] == py_pkt[:11]
+        ), "header/payload bytes do not match"
 
     def test_checksum_algorithms_are_distinct(self):
         """XOR checksum (FPGA) and CRC-8 (Python) produce different results.
@@ -71,12 +83,15 @@ class TestFPGAPacketFormatE2E:
         alpha, beta, theta, delta = 1000, 2000, 3000, 4000
         fpga_pkt = build_fpga_packet(alpha, beta, theta, delta)
 
-        row = pd.Series({"delta": delta, "theta": theta, "alpha": alpha, "beta": beta})
+        row = pd.Series(
+            {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
+        )
         py_pkt = transmission.df_to_packet(row)
 
         xor_chk = fpga_pkt[-1]
         crc_chk = py_pkt[-1]
         assert isinstance(xor_chk, int)
         assert isinstance(crc_chk, int)
-        # Values may coincidentally match for specific inputs, but algorithms differ.
-        # If they always match, one algorithm may have been silently changed.
+        # Values may coincidentally match for specific inputs, but algorithms
+        # differ. If they always match, one algorithm may have been silently
+        # changed.

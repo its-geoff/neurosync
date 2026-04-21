@@ -7,7 +7,6 @@ No real LSL or serial hardware required.
 import unittest.mock as mock
 
 import numpy as np
-import pytest
 
 import main
 import transmission
@@ -29,6 +28,7 @@ def _fake_eeg_samples(n, seed=0):
     channels = rng.uniform(-100, 100, size=(n, 4))
     return channels.tolist()
 
+
 def _run_lsl_mode(samples):
     written = []
     ser = mock.MagicMock()
@@ -36,15 +36,14 @@ def _run_lsl_mode(samples):
 
     with (
         mock.patch("main.resolve_streams", return_value=[mock.MagicMock()]),
-        mock.patch("main.StreamInlet", side_effect=lambda _: _FakeLSLInlet(samples)),
+        mock.patch(
+            "main.StreamInlet", side_effect=lambda _: _FakeLSLInlet(samples)
+        ),
         mock.patch("data_processing.graphing.run"),
     ):
         main.connect_and_process(ser)
 
     return written
-
-
-import data_processing
 
 
 class TestLSLToUARTPipelineE2E:
@@ -78,7 +77,11 @@ class TestLSLToUARTPipelineE2E:
     def test_keyboard_interrupt_exits_cleanly(self):
         ser = mock.MagicMock()
         with (
-            mock.patch("main.resolve_streams", return_value=[mock.MagicMock()]),
-            mock.patch("main.StreamInlet", side_effect=lambda _: _FakeLSLInlet([])),
+            mock.patch(
+                "main.resolve_streams", return_value=[mock.MagicMock()]
+            ),
+            mock.patch(
+                "main.StreamInlet", side_effect=lambda _: _FakeLSLInlet([])
+            ),
         ):
             main.connect_and_process(ser)

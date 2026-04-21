@@ -7,7 +7,6 @@ import time
 
 import numpy as np
 import pandas as pd
-import pytest
 
 import data_processing
 
@@ -49,7 +48,9 @@ class TestFFTPipelineThroughput:
             data_processing.transform_to_hz(df)
         elapsed = time.perf_counter() - start
         rate = n_runs / elapsed
-        print(f"[fft throughput] {rate:.1f} pipeline-runs/s over {n_runs} runs")
+        print(
+            f"[fft throughput] {rate:.1f} pipeline-runs/s over {n_runs} runs"
+        )
         assert rate > 2.0
 
     def test_get_stats_on_1000_row_dataframe(self):

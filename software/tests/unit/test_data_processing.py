@@ -34,7 +34,13 @@ def test_transform_to_hz_valid():
     result = transform_to_hz(fake_data)
 
     assert isinstance(result, pd.DataFrame)
-    assert list(result.columns) == ["timestamp", "delta", "theta", "alpha", "beta"]
+    assert list(result.columns) == [
+        "timestamp",
+        "delta",
+        "theta",
+        "alpha",
+        "beta",
+    ]
 
 
 def test_transform_to_hz_small_input():

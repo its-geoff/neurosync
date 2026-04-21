@@ -5,7 +5,6 @@ Stress tests for windowing and overlap buffer correctness under rapid calls.
 
 import numpy as np
 import pandas as pd
-import pytest
 
 import data_processing
 

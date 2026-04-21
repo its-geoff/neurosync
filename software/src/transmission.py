@@ -18,6 +18,7 @@ PAYLOAD_LENGTH = 8  # 4 bands * 2 bytes each
 BAND_ORDER = ["delta", "theta", "alpha", "beta"]
 PACK_FORMAT = "HHHH"
 
+
 def validate_packet(packet: bytes) -> bool:
     """Returns True if the packet checksum is valid.
 

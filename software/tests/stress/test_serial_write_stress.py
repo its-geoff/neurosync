@@ -8,13 +8,14 @@ import time
 import unittest.mock as mock
 
 import pandas as pd
-import pytest
 
 import transmission
 
 
 def make_band_row(delta=1000, theta=2000, alpha=3000, beta=4000):
-    return pd.Series({"delta": delta, "theta": theta, "alpha": alpha, "beta": beta})
+    return pd.Series(
+        {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
+    )
 
 
 class TestSerialWriteRateSimulation:
@@ -32,7 +33,10 @@ class TestSerialWriteRateSimulation:
             ser.write(pkt)
         elapsed = time.perf_counter() - start
         rate = n / elapsed
-        print(f"\n[serial sim] {n} writes in {elapsed:.3f}s  →  {rate:,.0f} writes/s")
+        print(
+            f"\n[serial sim] {n} writes in {elapsed:.3f}s  →  {rate:,.0f} "
+            "writes/s"
+        )
         assert len(written) == n
         assert rate > 1_000
 
@@ -52,7 +56,10 @@ class TestSerialWriteRateSimulation:
                 time.sleep(sleep_for)
 
         elapsed = times[-1] - times[0]
-        print(f"\n[50Hz sim] {n} packets over {elapsed:.3f}s (ideal: {(n-1)*interval:.3f}s)")
+        print(
+            f"\n[50Hz sim] {n} packets over {elapsed:.3f}s (ideal: "
+            f"{(n-1)*interval:.3f}s)"
+        )
         assert elapsed < (n - 1) * interval * 1.20 + 0.1
 
     def test_concurrent_encode_and_validate_threads(self):
@@ -78,5 +85,8 @@ class TestSerialWriteRateSimulation:
         elapsed = time.perf_counter() - start
         total = 4 * n
         rate = total / elapsed
-        print(f"\n[concurrent encode] {total} ops across 4 threads in {elapsed:.3f}s  →  {rate:,.0f} ops/s")
+        print(
+            f"\n[concurrent encode] {total} ops across 4 threads in "
+            f"{elapsed:.3f}s  →  {rate:,.0f} ops/s"
+        )
         assert len(errors) == 0, f"thread errors: {errors}"

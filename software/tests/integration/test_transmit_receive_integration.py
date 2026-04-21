@@ -8,13 +8,14 @@ import unittest.mock as mock
 
 import numpy as np
 import pandas as pd
-import pytest
 
 import transmission
 
 
 def make_band_power_row(delta=1000, theta=2000, alpha=3000, beta=4000):
-    return pd.Series({"delta": delta, "theta": theta, "alpha": alpha, "beta": beta})
+    return pd.Series(
+        {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
+    )
 
 
 def make_band_power_df(n_rows=4, seed=0):
@@ -61,7 +62,9 @@ class TestTransmitReceiveIntegration:
             assert result.iloc[i]["delta"] == int(original["delta"])
 
     def test_receive_skips_corrupted_packets(self):
-        good = transmission.df_to_packet(make_band_power_row(100, 200, 300, 400))
+        good = transmission.df_to_packet(
+            make_band_power_row(100, 200, 300, 400)
+        )
         bad = bytearray(good)
         bad[-1] ^= 0xFF
 
