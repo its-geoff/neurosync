@@ -41,6 +41,9 @@ jobs:
     - name: Set up Python
       run: uv python install 3.13
 
+    - name: Install dependencies
+      run: uv sync --frozen --all-extras
+
     - name: Install liblsl from source
       run: |
         sudo apt-get install -y cmake g++ git
@@ -54,9 +57,6 @@ jobs:
         
         PYLSL_LIB=$(cd /home/runner/work/neurosync/neurosync/software && uv run python -c "import pylsl.lib as l; import os; print(os.path.dirname(l.__file__))")
         sudo cp /usr/local/lib/liblsl.so* "$PYLSL_LIB/"
-
-    - name: Install dependencies
-      run: uv sync --frozen --all-extras
 
     - name: Format code
       run: |
@@ -72,19 +72,6 @@ jobs:
       with:
         commit_message: "style: auto-format with black, isort, and docformatter"
         token: ${{ secrets.COMMIT_PAT }}
-
-    - name: Debug pylsl state
-      run: |
-        uv run python -c "
-        import pylsl
-        import pylsl.lib as l
-        import os
-        lib_dir = os.path.dirname(l.__file__)
-        print('pylsl location:', pylsl.__file__)
-        print('lib dir contents:', os.listdir(lib_dir))
-        print('lib dir path:', lib_dir)
-        "
-        find /usr/local/lib -name "liblsl*"
 
     - name: Run tests
       run: uv run pytest -v
