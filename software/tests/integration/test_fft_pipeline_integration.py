@@ -39,7 +39,7 @@ class TestFFTPipelineIntegration:
     def test_band_power_values_are_non_negative(self):
         df = make_raw_eeg(512)
         freq_df = data_processing.transform_to_hz(df)
-        for band in ["delta", "theta", "alpha", "beta"]:
+        for band in ["alpha", "beta", "theta", "delta"]:
             assert (freq_df[band] >= 0).all(), f"{band} contains negatives"
 
     def test_multiple_windows_produce_monotone_timestamps(self):
@@ -53,7 +53,7 @@ class TestFFTPipelineIntegration:
         freq_df = data_processing.transform_to_hz(df)
         numeric = freq_df.drop(columns=["timestamp"])
         stats = data_processing.get_stats(numeric)
-        for band in ["delta", "theta", "alpha", "beta"]:
+        for band in ["alpha", "beta", "theta", "delta"]:
             assert np.isfinite(stats["mean"][band])
             assert stats["mean"][band] >= 0
 
@@ -70,7 +70,7 @@ class TestFFTPipelineIntegration:
         df = make_raw_eeg(256)
         with mock.patch("data_processing.graphing.run"):
             result = data_processing.process_pipeline(df)
-        for band in ["delta", "theta", "alpha", "beta"]:
+        for band in ["alpha", "beta", "theta", "delta"]:
             assert band in result["frequency_data"].columns
 
     def test_larger_input_produces_more_windows(self):

@@ -12,4 +12,9 @@ cmake --build . --config Release
 sudo cmake --install .
 
 sudo ldconfig
-echo "liblsl installed to /usr/local/lib"
+
+# Copy into pylsl's package directory so it can find it
+PYLSL_LIB=$(uv run python -c "import pylsl.lib as l; import os; print(os.path.dirname(l.__file__))")
+sudo cp /usr/local/lib/liblsl.so* "$PYLSL_LIB/"
+
+echo "liblsl installed to /usr/local/lib and copied to $PYLSL_LIB"

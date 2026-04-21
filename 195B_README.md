@@ -87,7 +87,7 @@ cd neurosync
 
 # Install package manager (uv)
 curl -LsSf https://astral.sh/uv/install.sh | sh     # macOS / Linux
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.sh | iex"   # Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"   # Windows (PowerShell)
 
 # Set up virtual environment
 source .venv/bin/activate        # macOS / Linux

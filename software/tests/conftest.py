@@ -12,6 +12,6 @@ import unittest.mock as mock
 def pytest_configure(config):
     if "pylsl" not in sys.modules:
         pylsl = types.ModuleType("pylsl")
-        pylsl.resolve_streams = lambda *a, **k: [mock.MagicMock()]
+        pylsl.resolve_byprop = lambda *a, **k: [mock.MagicMock()]
         pylsl.StreamInlet = mock.MagicMock
         sys.modules["pylsl"] = pylsl

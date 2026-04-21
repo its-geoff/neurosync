@@ -93,11 +93,7 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
         new_row = pd.DataFrame(
             [
                 {
-                    "timestamp": (
-                        data["timestamp"].iloc[start]
-                        if "timestamp" in data.columns
-                        else start
-                    ),
+                    "timestamp": data["timestamp"].iloc[start],
                     "delta": float(delta_band),
                     "theta": float(theta_band),
                     "alpha": float(alpha_band),

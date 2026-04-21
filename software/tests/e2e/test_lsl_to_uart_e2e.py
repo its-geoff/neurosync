@@ -25,8 +25,11 @@ class _FakeLSLInlet:
 
 def _fake_eeg_samples(n, seed=0):
     rng = np.random.default_rng(seed)
-    channels = rng.uniform(-100, 100, size=(n, 4))
-    return channels.tolist()
+    samples = []
+    for i in range(n):
+        channels = rng.uniform(-100, 100, size=4).tolist()
+        samples.append([float(i)] + channels)
+    return samples
 
 
 def _run_lsl_mode(samples):
@@ -35,7 +38,7 @@ def _run_lsl_mode(samples):
     ser.write.side_effect = lambda p: written.append(p)
 
     with (
-        mock.patch("main.resolve_streams", return_value=[mock.MagicMock()]),
+        mock.patch("main.resolve_byprop", return_value=[mock.MagicMock()]),
         mock.patch(
             "main.StreamInlet", side_effect=lambda _: _FakeLSLInlet(samples)
         ),
@@ -77,9 +80,7 @@ class TestLSLToUARTPipelineE2E:
     def test_keyboard_interrupt_exits_cleanly(self):
         ser = mock.MagicMock()
         with (
-            mock.patch(
-                "main.resolve_streams", return_value=[mock.MagicMock()]
-            ),
+            mock.patch("main.resolve_byprop", return_value=[mock.MagicMock()]),
             mock.patch(
                 "main.StreamInlet", side_effect=lambda _: _FakeLSLInlet([])
             ),

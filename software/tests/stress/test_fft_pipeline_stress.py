@@ -57,7 +57,7 @@ class TestFFTPipelineThroughput:
         rng = np.random.default_rng(2)
         df = pd.DataFrame(
             rng.uniform(0, 1000, size=(1000, 4)),
-            columns=["delta", "theta", "alpha", "beta"],
+            columns=["alpha", "beta", "theta", "delta"],
         )
         start = time.perf_counter()
         result = data_processing.get_stats(df)

@@ -8,7 +8,7 @@ import os  # standard library
 
 import pandas as pd  # third-party
 import serial
-from pylsl import StreamInlet, resolve_streams
+from pylsl import StreamInlet, resolve_byprop
 
 import data_processing  # local
 import transmission
@@ -27,7 +27,7 @@ def connect_and_process(ser: serial.Serial) -> None:
     print("Resolving Muse 2 EEG stream...")
     # Stream acquisition
     # pylint: disable=unexpected-keyword-arg, too-many-function-args
-    streams = resolve_streams("type", "EEG")
+    streams = resolve_byprop("type", "EEG")
     inlet = StreamInlet(streams[0])
     print("Stream acquired. Beginning transmission. Press Ctrl+C to stop.")
 
@@ -37,23 +37,25 @@ def connect_and_process(ser: serial.Serial) -> None:
         print("before loop")
         while True:
             sample, _ = inlet.pull_sample()
-            buffer.append(sample[:4])
+            buffer.append(sample[:5])
 
             if len(buffer) >= 256:  # window size
                 window_df = pd.DataFrame(
                     buffer[:256],
-                    columns=["ch1", "ch2", "ch3", "ch4"],
+                    columns=["timestamp", "ch1", "ch2", "ch3", "ch4"],
                 )
+                print("before processing")
                 # change below:
                 # band_power_df = data_processing.transform_to_hz(window_df)
-                band_power_df = data_processing.transform_to_hz(window_df)
-
-                for _, row in band_power_df.iterrows():
-                    packet = transmission.df_to_packet(row)
-                    ser.write(packet)
+                result = data_processing.process_pipeline(window_df)
+                print("after processing")
+                band_power_df = result["frequency_data"]
+                print("transmitting...")
+                transmission.transmit(band_power_df, ser)
+                print("after transmitting")
 
                 buffer = buffer[128:]  # 50% window overlap
-        print("after loop")
+                print("after loop")
     except KeyboardInterrupt:
         print("Stream interrupted. Closing.")
 
@@ -64,8 +66,8 @@ def main():
     mode = input("Select mode (lsl / csv): ").strip().lower()
 
     if mode == "lsl":
-        # NOTE: change port if needed for Windows (e.g., COM3)
-        with serial.Serial(port="COM3", baudrate=115200, timeout=1) as ser:
+        # NOTE: change port if needed for Windows (e.g., COM5)
+        with serial.Serial(port="COM8", baudrate=115200, timeout=1) as ser:
             connect_and_process(ser)
 
     elif mode == "csv":
