@@ -14,12 +14,13 @@ SYNC_BYTE_1 = 0xAA
 SYNC_BYTE_2 = 0x55
 PAYLOAD_LENGTH = 8  # 4 bands * 2 bytes each
 
+
 def xor_checksum(data: bytes) -> int:
     result = 0
 
     for b in data:
         result ^= b
-        
+
     return result
 
 

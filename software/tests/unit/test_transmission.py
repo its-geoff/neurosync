@@ -7,12 +7,12 @@ from transmission import (
     PAYLOAD_LENGTH,
     SYNC_BYTE_1,
     SYNC_BYTE_2,
-    xor_checksum,
     df_to_packet,
     packet_to_df,
     receive,
     transmit,
     validate_packet,
+    xor_checksum,
 )
 
 SAMPLE_ROW = {"delta": 41, "theta": 86, "alpha": 31, "beta": 12}
