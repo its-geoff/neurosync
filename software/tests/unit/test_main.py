@@ -22,11 +22,11 @@ def _make_pylsl_stub():
             except StopIteration:
                 raise KeyboardInterrupt  # stop the loop when samples run out
 
-    def resolve_streams(stream_type, stream_name):
+    def resolve_byprop(stream_type, stream_name):
         return [MagicMock()]  # return one fake stream
 
     pylsl.StreamInlet = FakeInlet
-    pylsl.resolve_streams = resolve_streams
+    pylsl.resolve_byprop = resolve_byprop
     return pylsl
 
 
@@ -55,7 +55,7 @@ def _make_fake_ser():
 #  Tests
 
 #  patch target helper
-# main.py uses "from pylsl import StreamInlet, resolve_streams" so the names
+# main.py uses "from pylsl import StreamInlet, resolve_byprop" so the names
 # live directly on the main module, not under main.pylsl.
 # All other dependencies (data_processing, transmission) are imported as
 # modules, so patches use "main.data_processing.X" and "main.transmission.X".
@@ -70,8 +70,8 @@ def _patch_inlet(samples):
 
 
 def _patch_resolve():
-    """Patch main.resolve_streams to return one fake stream."""
-    return patch("main.resolve_streams", return_value=[MagicMock()])
+    """Patch main.resolve_byprop to return one fake stream."""
+    return patch("main.resolve_byprop", return_value=[MagicMock()])
 
 
 def _patch_fft(return_value=None):
