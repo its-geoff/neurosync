@@ -35,7 +35,7 @@ def _run_lsl_mode(samples):
     ser.write.side_effect = lambda p: written.append(p)
 
     with (
-        mock.patch("main.resolve_streams", return_value=[mock.MagicMock()]),
+        mock.patch("main.resolve_byprop", return_value=[mock.MagicMock()]),
         mock.patch(
             "main.StreamInlet", side_effect=lambda _: _FakeLSLInlet(samples)
         ),
@@ -78,7 +78,7 @@ class TestLSLToUARTPipelineE2E:
         ser = mock.MagicMock()
         with (
             mock.patch(
-                "main.resolve_streams", return_value=[mock.MagicMock()]
+                "main.resolve_byprop", return_value=[mock.MagicMock()]
             ),
             mock.patch(
                 "main.StreamInlet", side_effect=lambda _: _FakeLSLInlet([])

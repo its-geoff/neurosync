@@ -44,20 +44,6 @@ jobs:
     - name: Install dependencies
       run: uv sync --frozen --all-extras
 
-    - name: Install liblsl from source
-      run: |
-        sudo apt-get install -y cmake g++ git
-        git clone https://github.com/sccn/liblsl.git /tmp/liblsl
-        cd /tmp/liblsl
-        mkdir build && cd build
-        cmake ..
-        cmake --build . --config Release
-        sudo cmake --install .
-        sudo ldconfig
-        
-        PYLSL_LIB=$(cd /home/runner/work/neurosync/neurosync/software && uv run python -c "import pylsl.lib as l; import os; print(os.path.dirname(l.__file__))")
-        sudo cp /usr/local/lib/liblsl.so* "$PYLSL_LIB/"
-
     - name: Format code
       run: |
         uv run black . --exclude "/(\.venv|\.git|__pycache__)/"
@@ -70,7 +56,7 @@ jobs:
     - name: Commit formatting changes
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
-        commit_message: "style: auto-format with black, isort, and docformatter"
+        commit_message: "style: auto-format with black, isort, and docformatter [skip ci]"
         token: ${{ secrets.COMMIT_PAT }}
 
     - name: Run tests
