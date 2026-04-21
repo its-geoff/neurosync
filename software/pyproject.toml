@@ -61,4 +61,5 @@ ignore = ["**/*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+addopts = "--cov=src --cov-report=xml:../docs/evaluation/coverage-report/coverage.xml --cov-report=html:../docs/evaluation/coverage-report/html --cov-report=term-missing"
 
