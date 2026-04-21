@@ -44,14 +44,18 @@ def connect_and_process(ser: serial.Serial) -> None:
                     buffer[:256],
                     columns=["ch1", "ch2", "ch3", "ch4"],
                 )
+                print("before processing")
                 # change below:
                 # band_power_df = data_processing.transform_to_hz(window_df)
                 result = data_processing.process_pipeline(window_df)
+                print("after processing")
                 band_power_df = result["frequency_data"]
+                print("transmitting...")
                 transmission.transmit(band_power_df, ser)
+                print("after transmitting")
 
                 buffer = buffer[128:]  # 50% window overlap
-        print("after loop")
+                print("after loop")
     except KeyboardInterrupt:
         print("Stream interrupted. Closing.")
 
@@ -63,7 +67,7 @@ def main():
 
     if mode == "lsl":
         # NOTE: change port if needed for Windows (e.g., COM5)
-        with serial.Serial(port="COM5", baudrate=115200, timeout=1) as ser:
+        with serial.Serial(port="COM8", baudrate=115200, timeout=1) as ser:
             connect_and_process(ser)
 
     elif mode == "csv":

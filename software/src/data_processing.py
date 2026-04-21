@@ -161,7 +161,7 @@ def process_pipeline(df: pd.DataFrame):
     freq_data = transform_to_hz(df)
     stats_data = freq_data.drop(columns=["timestamp"], errors="ignore")
     stats = get_stats(stats_data)
-    graphing.run(freq_data)
+    # graphing.run(freq_data)
 
     return {
         "frequency_data": freq_data,
