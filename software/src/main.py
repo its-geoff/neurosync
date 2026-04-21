@@ -46,11 +46,9 @@ def connect_and_process(ser: serial.Serial) -> None:
                 )
                 # change below:
                 # band_power_df = data_processing.transform_to_hz(window_df)
-                band_power_df = data_processing.transform_to_hz(window_df)
-
-                for _, row in band_power_df.iterrows():
-                    packet = transmission.df_to_packet(row)
-                    transmission.transmit(packet, ser)
+                result = data_processing.process_pipeline(window_df)
+                band_power_df = result["frequency_data"]
+                transmission.transmit(band_power_df, ser)
 
                 buffer = buffer[128:]  # 50% window overlap
         print("after loop")
