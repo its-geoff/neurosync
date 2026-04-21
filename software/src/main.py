@@ -50,7 +50,7 @@ def connect_and_process(ser: serial.Serial) -> None:
 
                 for _, row in band_power_df.iterrows():
                     packet = transmission.df_to_packet(row)
-                    ser.write(packet)
+                    transmission.transmit(packet)
 
                 buffer = buffer[128:]  # 50% window overlap
         print("after loop")
@@ -64,8 +64,8 @@ def main():
     mode = input("Select mode (lsl / csv): ").strip().lower()
 
     if mode == "lsl":
-        # NOTE: change port if needed for Windows (e.g., COM3)
-        with serial.Serial(port="COM3", baudrate=115200, timeout=1) as ser:
+        # NOTE: change port if needed for Windows (e.g., COM5)
+        with serial.Serial(port="COM5", baudrate=115200, timeout=1) as ser:
             connect_and_process(ser)
 
     elif mode == "csv":

@@ -46,9 +46,9 @@ def df_to_packet(row: pd.Series) -> bytes:
             [header][delta(u16)][theta(u16)][alpha(u16)][beta(u16)][crc8]
     """
     print(f"delta: {int(row["delta"])}")
-    print(f"delta: {int(row["theta"])}")
-    print(f"delta: {int(row["alpha"])}")
-    print(f"delta: {int(row["beta"])}")
+    print(f"theta: {int(row["theta"])}")
+    print(f"alpha: {int(row["alpha"])}")
+    print(f"beta: {int(row["beta"])}")
 
     # define header, payload, and checksum
     header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
