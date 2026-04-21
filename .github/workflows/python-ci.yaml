@@ -51,6 +51,10 @@ jobs:
         cmake --build . --config Release
         sudo cmake --install .
         sudo ldconfig
+        
+        # Copy into pylsl's package directory so it can find it
+        PYLSL_LIB=$(uv run python -c "import pylsl.lib as l; import os; print(os.path.dirname(l.__file__))")
+        sudo cp /usr/local/lib/liblsl.so* $PYLSL_LIB/
 
     - name: Install dependencies
       run: uv sync --frozen --all-extras
@@ -60,14 +64,6 @@ jobs:
         uv run black . --exclude "/(\.venv|\.git|__pycache__)/"
         uv run isort .
         find src -name "*.py" -exec uv run --quiet docformatter --wrap-summaries 79 --wrap-descriptions 79 --in-place {} + || true
-
-    - name: Debug pylsl lib
-      run: |
-        uv run python -c "
-        import pylsl.lib as lib
-        import os
-        print(os.listdir(os.path.dirname(lib.__file__)))
-        "
 
     - name: Lint code
       run: uv run flake8 .
