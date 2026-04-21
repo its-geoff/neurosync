@@ -27,9 +27,13 @@ def test_get_data_empty_string():
 
 def test_transform_to_hz_valid():
     # Create fake EEG data (256 rows, 4 channels)
-    fake_data = pd.DataFrame(
-        np.random.rand(256, 4), columns=["ch1", "ch2", "ch3", "ch4"]
-    )
+    fake_data = pd.DataFrame({
+        "timestamp": np.arange(256, dtype=float),
+        "ch1": np.random.rand(256),
+        "ch2": np.random.rand(256),
+        "ch3": np.random.rand(256),
+        "ch4": np.random.rand(256),
+    })
 
     result = transform_to_hz(fake_data)
 
@@ -45,9 +49,13 @@ def test_transform_to_hz_valid():
 
 def test_transform_to_hz_small_input():
     # Less than 256 rows → should return empty DataFrame
-    small_data = pd.DataFrame(
-        np.random.rand(100, 4), columns=["ch1", "ch2", "ch3", "ch4"]
-    )
+    small_data = pd.DataFrame({
+        "timestamp": np.arange(100, dtype=float),
+        "ch1": np.random.rand(100),
+        "ch2": np.random.rand(100),
+        "ch3": np.random.rand(100),
+        "ch4": np.random.rand(100),
+    })
 
     result = transform_to_hz(small_data)
     assert result.empty
@@ -64,6 +72,7 @@ def test_transform_to_hz_invalid_input():
 def test_get_stats_valid():
     fake_data = pd.DataFrame(
         {
+            "timestamp": [1, 2, 3],
             "delta": [1, 2, 3],
             "theta": [2, 3, 4],
             "alpha": [3, 4, 5],

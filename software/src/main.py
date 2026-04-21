@@ -37,12 +37,12 @@ def connect_and_process(ser: serial.Serial) -> None:
         print("before loop")
         while True:
             sample, _ = inlet.pull_sample()
-            buffer.append(sample[:4])
+            buffer.append(sample[:5])
 
             if len(buffer) >= 256:  # window size
                 window_df = pd.DataFrame(
                     buffer[:256],
-                    columns=["ch1", "ch2", "ch3", "ch4"],
+                    columns=["timestamp", "ch1", "ch2", "ch3", "ch4"],
                 )
                 print("before processing")
                 # change below:
