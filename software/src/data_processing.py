@@ -12,8 +12,6 @@ import numpy as np
 import pandas as pd
 from scipy.fft import fft, fftfreq
 
-import graphing
-
 # global variables
 FOLDER_NAME = os.path.abspath(os.path.join("..", "data"))
 
@@ -161,7 +159,6 @@ def process_pipeline(df: pd.DataFrame):
     freq_data = transform_to_hz(df)
     stats_data = freq_data.drop(columns=["timestamp"], errors="ignore")
     stats = get_stats(stats_data)
-    # graphing.run(freq_data)
 
     return {
         "frequency_data": freq_data,
