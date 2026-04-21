@@ -21,7 +21,7 @@ def make_band_power_row(delta=1000, theta=2000, alpha=3000, beta=4000):
 def make_band_power_df(n_rows=4, seed=0):
     rng = np.random.default_rng(seed)
     data = rng.integers(0, 60000, size=(n_rows, 4))
-    return pd.DataFrame(data, columns=["delta", "theta", "alpha", "beta"])
+    return pd.DataFrame(data, columns=["alpha", "beta", "theta", "delta"])
 
 
 class TestTransmitReceiveIntegration:

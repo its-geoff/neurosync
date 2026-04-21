@@ -31,7 +31,7 @@ class TestDataIntegrityUnderLoad:
     def test_fft_produces_finite_values_for_large_input(self):
         df = make_raw_eeg(2048)
         result = data_processing.transform_to_hz(df)
-        for band in ["delta", "theta", "alpha", "beta"]:
+        for band in ["alpha", "beta", "theta", "delta"]:
             assert np.isfinite(
                 result[band].values
             ).all(), f"{band} contains inf/nan"

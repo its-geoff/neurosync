@@ -6,17 +6,21 @@ pandas DataFrame to UART packet and vice versa.
 
 import struct
 
-import crcmod
 import pandas as pd
 import serial
 
 # global variables
-crc8 = crcmod.predefined.mkCrcFun("crc-8")
 SYNC_BYTE_1 = 0xAA
 SYNC_BYTE_2 = 0x55
 PAYLOAD_LENGTH = 8  # 4 bands * 2 bytes each
-BAND_ORDER = ["delta", "theta", "alpha", "beta"]
-PACK_FORMAT = "HHHH"
+
+def xor_checksum(data: bytes) -> int:
+    result = 0
+
+    for b in data:
+        result ^= b
+        
+    return result
 
 
 def validate_packet(packet: bytes) -> bool:
@@ -30,7 +34,7 @@ def validate_packet(packet: bytes) -> bool:
     """
     payload = packet[3:-1]
     received_checksum = packet[-1]
-    expected_checksum = crc8(payload)
+    expected_checksum = xor_checksum(payload)
 
     return received_checksum == expected_checksum
 
@@ -51,9 +55,7 @@ def df_to_packet(row: dict) -> bytes:
     header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
     values = [max(0, min(65535, int(row[band]))) for band in BAND_ORDER]
     payload = struct.pack(">HHHH", *values)
-    checksum = PAYLOAD_LENGTH
-    for b in payload:
-        checksum ^= b
+    checksum = xor_checksum(payload)
 
     return header + payload + bytes([checksum])
 
@@ -74,7 +76,7 @@ def packet_to_df(ser: serial.Serial) -> dict | None:
     if not validate_packet(packet):
         return None
 
-    delta, theta, alpha, beta = struct.unpack("HHHH", packet[3:-1])
+    alpha, beta, theta, delta = struct.unpack(">HHHH", packet[3:-1])
     return {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
 
 
@@ -114,4 +116,4 @@ def receive(ser: serial.Serial, expected_rows: int) -> pd.DataFrame:
         if row:
             rows.append(row)
 
-    return pd.DataFrame(rows, columns=["delta", "theta", "alpha", "beta"])
+    return pd.DataFrame(rows, columns=["alpha", "beta", "theta", "delta"])

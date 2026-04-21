@@ -17,7 +17,7 @@ from matplotlib.lines import Line2D
 from numpy.typing import NDArray
 
 # module level constants
-BANDS = ["delta", "theta", "alpha", "beta"]
+BANDS = ["alpha", "beta", "theta", "delta"]
 WINDOW_SIZE = 50
 
 

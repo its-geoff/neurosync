@@ -61,7 +61,7 @@ class TestConstants:
         assert len(BANDS) == 4
 
     def test_bands_expected_names(self):
-        assert BANDS == ["delta", "theta", "alpha", "beta"]
+        assert BANDS == ["alpha", "beta", "theta", "delta"]
 
     def test_window_size_is_positive(self):
         assert WINDOW_SIZE > 0
