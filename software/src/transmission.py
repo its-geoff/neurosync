@@ -15,7 +15,8 @@ crc8 = crcmod.predefined.mkCrcFun("crc-8")
 SYNC_BYTE_1 = 0xAA
 SYNC_BYTE_2 = 0x55
 PAYLOAD_LENGTH = 8  # 4 bands * 2 bytes each
-
+BAND_ORDER = ["delta", "theta", "alpha", "beta"]
+PACK_FORMAT = "HHHH"
 
 def validate_packet(packet: bytes) -> bool:
     """Returns True if the packet checksum is valid.
@@ -45,11 +46,9 @@ def df_to_packet(row: pd.Series) -> bytes:
     """
     # define header, payload, and checksum
     header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
-    payload = struct.pack(
-        "HHHH", row["delta"], row["theta"], row["alpha"], row["beta"]
-    )
+    values = [int(row[band]) for band in BAND_ORDER]
+    payload = struct.pack(PACK_FORMAT, *values)
     checksum = crc8(payload)
-
     return header + payload + bytes([checksum])
 
 

@@ -53,3 +53,12 @@ skip = [".venv", ".git", "__pycache__"]
 [tool.black]
 line-length = 79
 target-version = ["py313"]
+
+
+[tool.pyright]
+ignore = ["**/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
