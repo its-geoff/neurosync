@@ -35,17 +35,17 @@ def validate_packet(packet: bytes) -> bool:
     return received_checksum == expected_checksum
 
 
-def df_to_packet(row: pd.Series) -> bytes:
+def df_to_packet(row: dict) -> bytes:
     """Packs a row of EEG band power values to a UART packet.
 
     Arguments:
-        row (pd.Series): A pandas Series of EEG band power values.
+        row (dict): A dictionary of EEG band power values.
 
     Returns:
         bytes: A set of bytes in the form of a UART packet.
             [header][delta(u16)][theta(u16)][alpha(u16)][beta(u16)][crc8]
     """
-    row = row.clip(lower=0, upper=65535, inplace=True)
+    row = pd.Series(row).clip(0, 65535).to_dict()
 
     print(f"delta: {int(row["delta"])}")
     print(f"theta: {int(row["theta"])}")
