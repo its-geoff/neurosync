@@ -52,7 +52,7 @@ jobs:
         sudo cmake --install .
         sudo ldconfig
         
-        PYLSL_LIB=$(uv run python -c "import pylsl.lib as l; import os; print(os.path.dirname(l.__file__))")
+        PYLSL_LIB=$(cd /home/runner/work/neurosync/neurosync/software && uv run python -c "import pylsl.lib as l; import os; print(os.path.dirname(l.__file__))")
         sudo cp /usr/local/lib/liblsl.so* "$PYLSL_LIB/"
 
     - name: Install dependencies
