@@ -16,8 +16,11 @@ __pycache__/
 dist/
 build/
 
-# processed data
+# coverage
 .coverage
+!docs/evaluation/coverage-report/
+
+# processed data
 data/processed.csv
 
 #vscode (repo clean)

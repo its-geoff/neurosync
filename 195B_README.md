@@ -2,6 +2,11 @@
 
 > This project uses an EEG headband with connected software to filter brainwaves and translate them to emotions.
 
+## Status
+
+![Python CI/CD](https://github.com/its-geoff/neurosync/actions/workflows/python-ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/its-geoff/neurosync/branch/main/graph/badge.svg?token=JBGWUQ796L)](https://codecov.io/gh/its-geoff/neurosync)
+
 ## Team
 
 | Name | GitHub | Email |
@@ -112,8 +117,18 @@ python3 main.py
 
 ```bash
 cd software/
-pytest
+pytest -v
 ```
+
+To run with coverage locally:
+
+```bash
+cd software/
+uv run pytest -v --cov=src --cov-report=term-missing --cov-report=html
+# Open htmlcov/index.html in your browser for a full line-by-line report
+```
+
+Coverage reports are automatically uploaded to [Codecov](https://codecov.io/gh/<org-or-user>/neurosync) on every push to `main` and on pull requests.
 
 ---
 
