@@ -4,17 +4,17 @@
 
 ## Status
 
-![Python CI/CD](https://github.com/its-geoff/neurosync/actions/workflows/python-ci.yml/badge.svg)
+![Python CI/CD](https://github.com/its-geoff/neurosync/actions/workflows/python-ci.yaml/badge.svg)
 [![codecov](https://codecov.io/gh/its-geoff/neurosync/branch/main/graph/badge.svg?token=JBGWUQ796L)](https://codecov.io/gh/its-geoff/neurosync)
 
 ## Team
 
-| Name | GitHub | Email |
-|------|--------|-------|
-| Geoffrey Agustin | [@its-geoff](https://github.com/its-geoff) | geoffrey.agustin@sjsu.edu |
-| Jairo Manansala | [@jairomanansala](https://github.com/jairomanansala) | jairo.manansala@sjsu.edu |
-| Garrett Miller | [@GaM1404](https://github.com/GaM1404) | garrett.miller@sjsu.edu |
-| Uyen Vu (Hillary Vu) | [@spicyMcChickens](https://github.com/spicyMcChickens) | uyen.vu02@sjsu.edu |
+| Name                 | GitHub                                                 | Email                     |
+| -------------------- | ------------------------------------------------------ | ------------------------- |
+| Geoffrey Agustin     | [@its-geoff](https://github.com/its-geoff)             | geoffrey.agustin@sjsu.edu |
+| Jairo Manansala      | [@jairomanansala](https://github.com/jairomanansala)   | jairo.manansala@sjsu.edu  |
+| Garrett Miller       | [@GaM1404](https://github.com/GaM1404)                 | garrett.miller@sjsu.edu   |
+| Uyen Vu (Hillary Vu) | [@spicyMcChickens](https://github.com/spicyMcChickens) | uyen.vu02@sjsu.edu        |
 
 **Advisor:** Charan Bhaskar
 
@@ -46,8 +46,8 @@ NeuroSync addresses the problem by utilizing electroencephalogram (EEG) technolo
 
 ## Screenshots
 
-| Feature | Screenshot |
-|---------|------------|
+| Feature     | Screenshot                                   |
+| ----------- | -------------------------------------------- |
 | [Feature 1] | ![Screenshot](docs/screenshots/feature1.png) |
 | [Feature 2] | ![Screenshot](docs/screenshots/feature2.png) |
 
@@ -56,22 +56,24 @@ NeuroSync addresses the problem by utilizing electroencephalogram (EEG) technolo
 ## Tech Stack
 
 ### Hardware
-| Category | Technology |
-|----------|------------|
-| Language | SystemVerilog |
-| Communication Protocol | UART |
-| FPGA Board | Diligent Nexys A7-100T |
-| EEG headband | Muse 2 |
+
+| Category               | Technology             |
+| ---------------------- | ---------------------- |
+| Language               | SystemVerilog          |
+| Communication Protocol | UART                   |
+| FPGA Board             | Diligent Nexys A7-100T |
+| EEG headband           | Muse 2                 |
 
 ### Software
-| Category | Technology |
-|----------|------------|
-| Language | Python 3.13.* |
-| Package Management | uv |
-| Signal Processing | SciPy, NumPy |
-| Data Formatting and Analysis | pandas |
-| Data I/O | pyserial, muselsl/pylsl |
-| Testing | PyTest |
+
+| Category                     | Technology              |
+| ---------------------------- | ----------------------- |
+| Language                     | Python 3.13.\*          |
+| Package Management           | uv                      |
+| Signal Processing            | SciPy, NumPy            |
+| Data Formatting and Analysis | pandas                  |
+| Data I/O                     | pyserial, muselsl/pylsl |
+| Testing                      | PyTest                  |
 
 ---
 
@@ -79,7 +81,7 @@ NeuroSync addresses the problem by utilizing electroencephalogram (EEG) technolo
 
 ### Prerequisites
 
-- Python v3.13.*
+- Python v3.13.\*
 - uv v0.4+
 - Muse 2 headband
 
@@ -163,11 +165,13 @@ Coverage reports are automatically uploaded to [Codecov](https://codecov.io/gh/<
 ### Commit Messages
 
 Use clear, descriptive commit messages:
+
 - `Add user authentication endpoint`
 - `Fix database connection timeout issue`
 - `Update README with setup instructions`
 
 ## Documentation
+
 - [Architecture](docs/architecture.md)
 
 ---
@@ -184,4 +188,4 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENS
 
 ---
 
-*CMPE 195A/B - Senior Design Project | San Jose State University | Spring 2026*
+_CMPE 195A/B - Senior Design Project | San Jose State University | Spring 2026_
