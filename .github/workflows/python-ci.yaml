@@ -73,6 +73,19 @@ jobs:
         commit_message: "style: auto-format with black, isort, and docformatter"
         token: ${{ secrets.COMMIT_PAT }}
 
+    - name: Debug pylsl state
+      run: |
+        uv run python -c "
+        import pylsl
+        import pylsl.lib as l
+        import os
+        lib_dir = os.path.dirname(l.__file__)
+        print('pylsl location:', pylsl.__file__)
+        print('lib dir contents:', os.listdir(lib_dir))
+        print('lib dir path:', lib_dir)
+        "
+        find /usr/local/lib -name "liblsl*"
+
     - name: Run tests
       run: uv run pytest -v
 
