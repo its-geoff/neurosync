@@ -41,8 +41,16 @@ jobs:
     - name: Set up Python
       run: uv python install 3.13
 
-    - name: Install liblsl
-      run: sudo apt-get install -y liblsl-dev
+    - name: Install liblsl from source
+      run: |
+        sudo apt-get install -y cmake g++ git
+        git clone https://github.com/sccn/liblsl.git /tmp/liblsl
+        cd /tmp/liblsl
+        mkdir build && cd build
+        cmake ..
+        cmake --build . --config Release
+        sudo cmake --install .
+        sudo ldconfig
 
     - name: Install dependencies
       run: uv sync --frozen --all-extras
