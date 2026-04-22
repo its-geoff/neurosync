@@ -136,7 +136,7 @@ class TestWriteData:
 
     @patch("graphing.time.sleep")
     def test_surviving_frame_is_cumulative_slice(self, mock_sleep, sample_df):
-        """The frame that survives is fft_df.iloc[:n] — a cumulative head
+        """The frame that survives is fft_df.iloc[:n], a cumulative head
         slice.
 
         write_data intentionally discards stale frames, so with sleep mocked

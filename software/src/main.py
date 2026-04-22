@@ -1,4 +1,4 @@
-"""main.py.
+"""main.py
 
 Streams EEG data from Muse 2 via LSL, computes band power features per window,
 and transmits each result over UART in real time.
@@ -12,6 +12,7 @@ from pylsl import StreamInlet, resolve_byprop
 
 import data_processing  # local
 import transmission
+from graphing import LiveGrapher
 
 
 def connect_and_process(ser: serial.Serial) -> None:
@@ -31,10 +32,12 @@ def connect_and_process(ser: serial.Serial) -> None:
     inlet = StreamInlet(streams[0])
     print("Stream acquired. Beginning transmission. Press Ctrl+C to stop.")
 
+    grapher = LiveGrapher()
+    grapher.start()
+
     buffer = []
 
     try:
-        print("before loop")
         while True:
             sample, _ = inlet.pull_sample()
             buffer.append(sample[:5])
@@ -44,18 +47,12 @@ def connect_and_process(ser: serial.Serial) -> None:
                     buffer[:256],
                     columns=["timestamp", "ch1", "ch2", "ch3", "ch4"],
                 )
-                print("before processing")
-                # change below:
-                # band_power_df = data_processing.transform_to_hz(window_df)
                 result = data_processing.process_pipeline(window_df)
-                print("after processing")
                 band_power_df = result["frequency_data"]
-                print("transmitting...")
                 transmission.transmit(band_power_df, ser)
-                print("after transmitting")
+                grapher.put(band_power_df)
 
                 buffer = buffer[128:]  # 50% window overlap
-                print("after loop")
     except KeyboardInterrupt:
         print("Stream interrupted. Closing.")
 
@@ -93,14 +90,6 @@ def main():
 
     else:
         print("Invalid mode")
-
-
-# OG main function below
-# def main():
-# initializes serial and automatically cleans up after connection closed
-# NOTE: change port before running
-# with serial.Serial(port="/dev/ttyUSB0", baudrate=115200, timeout=1) as ser:
-# connect_and_process(ser)
 
 
 if __name__ == "__main__":

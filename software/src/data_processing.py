@@ -1,4 +1,4 @@
-"""data_processing.py.
+"""data_processing.py
 
 Processes EEG data for Muse 2, including:
 - Reading CSV
@@ -18,25 +18,6 @@ import graphing
 FOLDER_NAME = os.path.abspath(os.path.join("..", "data"))
 
 
-# --
-# get_data
-# Original version is commented nehehehe
-# def get_data(file_name):
-#     Extracts file from data folder for processing. Ensures compatibility
-#     across platforms.
-#
-#     Arguments:
-#         file_name (String): The full file name of the file to be processed.
-#
-#     Returns:
-#         String: The platform-specific path to the file.
-#     original: path = os.path.join(folder_name, file_name)
-#     return path
-#     # 2/20/26 returns stats instead of printing
-# --
-
-
-# Updated version for tests & usage:
 def get_data(file_name):
     """Extracts file from the data folder for processing. Ensures compatibility
     across platforms.
@@ -47,8 +28,6 @@ def get_data(file_name):
     Returns:
         str: The platform-specific path to the file.
 
-    Change note: 2/20/26 — uncommented and fixed indentation so that function
-    works.
     """
     if not isinstance(file_name, str):
         raise TypeError("file_name must be a string")
@@ -68,7 +47,7 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
     """
     if not isinstance(data, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame")
-    # 2/20/26 added input check to make sure it only runs on a pandas DataFrame
+
     window_size = 256  # sampling rate of Muse 2 headband
     step_size = 128  # 50% overlap between windows
     columns = ["timestamp", "delta", "theta", "alpha", "beta"]
@@ -112,10 +91,6 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
     return fft_df
 
 
-# --
-# get_stats
-# Returns statistical measures for a pandas DataFrame.
-# --
 def get_stats(data):
     """Returns statistical measures for a pandas DataFrame.
 
@@ -157,7 +132,6 @@ def process_pipeline(df: pd.DataFrame):
     freq_data = transform_to_hz(df)
     stats_data = freq_data.drop(columns=["timestamp"], errors="ignore")
     stats = get_stats(stats_data)
-    graphing.run(freq_data)
 
     return {
         "frequency_data": freq_data,
@@ -175,9 +149,7 @@ def run():
     Returns:
         None.
     """
-    # change to get_data(file) later with file being an arg in main
     file_path = get_data("muse2_eeg_data.csv")
-    # path to data file
 
     # check file existence
     if not os.path.exists(file_path):

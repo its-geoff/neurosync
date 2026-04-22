@@ -237,7 +237,7 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
         )
 
     def test_samples_sliced_to_four_channels(self):
-        """main.py does sample[:4] — fifth channel must not reach the
+        """main.py does sample[:5]; sixth channel must not reach the
         window."""
         captured = {}
 
@@ -267,7 +267,7 @@ class TestConnectAndProcessWindowShape(unittest.TestCase):
 
 
 class TestConnectAndProcessOverlap(unittest.TestCase):
-    """Tests the 50% window overlap — buffer[:128] is kept after each
+    """Tests the 50% window overlap - buffer[:128] is kept after each
     window."""
 
     def test_second_window_uses_overlap_from_first(self):
@@ -336,8 +336,6 @@ class TestConnectAndProcessOverlap(unittest.TestCase):
         ):
             main.connect_and_process(_make_fake_ser())
 
-        # 383 samples: first window at 256, then 255 in buffer — not enough for
-        # second
         self.assertEqual(call_count["n"], 1)
 
 
@@ -432,7 +430,7 @@ class TestConnectAndProcessShutdown(unittest.TestCase):
     """Tests that KeyboardInterrupt stops the loop cleanly."""
 
     def test_keyboard_interrupt_stops_loop(self):
-        """Loop must exit cleanly on KeyboardInterrupt — no exception
+        """Loop must exit cleanly on KeyboardInterrupt with no exception
         propagates."""
         with _patch_resolve(), _patch_inlet([]):
             try:
