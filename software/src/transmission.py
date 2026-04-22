@@ -96,7 +96,6 @@ def transmit(df: pd.DataFrame, ser: serial.Serial) -> None:
     for _, row in df.iterrows():
         packet = df_to_packet(row)
         ser.write(packet)
-        print(f"packet: {packet}")
 
 
 def receive(ser: serial.Serial, expected_rows: int) -> pd.DataFrame:
