@@ -26,23 +26,22 @@ def connect_and_process(ser: serial.Serial) -> None:
         None.
     """
     print("Resolving Muse 2 EEG stream...")
-    # Stream acquisition
-    # pylint: disable=unexpected-keyword-arg, too-many-function-args
     streams = resolve_byprop("type", "EEG")
     inlet = StreamInlet(streams[0])
     print("Stream acquired. Beginning transmission. Press Ctrl+C to stop.")
 
     grapher = LiveGrapher()
-    grapher.start()
 
     buffer = []
 
     try:
         while True:
             sample, _ = inlet.pull_sample()
+            if sample is None:
+                continue
             buffer.append(sample[:5])
 
-            if len(buffer) >= 256:  # window size
+            if len(buffer) >= 256:
                 window_df = pd.DataFrame(
                     buffer[:256],
                     columns=["timestamp", "ch1", "ch2", "ch3", "ch4"],
@@ -51,10 +50,14 @@ def connect_and_process(ser: serial.Serial) -> None:
                 band_power_df = result["frequency_data"]
                 transmission.transmit(band_power_df, ser)
                 grapher.put(band_power_df)
+                buffer = buffer[128:]
 
-                buffer = buffer[128:]  # 50% window overlap
+            grapher.pump()
+
     except KeyboardInterrupt:
         print("Stream interrupted. Closing.")
+    finally:
+        del inlet
 
 
 def main():
