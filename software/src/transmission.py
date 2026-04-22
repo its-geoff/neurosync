@@ -35,7 +35,7 @@ def validate_packet(packet: bytes) -> bool:
     """
     payload = packet[3:-1]
     received_checksum = packet[-1]
-    expected_checksum = xor_checksum(payload)
+    expected_checksum = xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
 
     return received_checksum == expected_checksum
 
