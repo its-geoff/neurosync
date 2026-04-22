@@ -56,7 +56,7 @@ def df_to_packet(row: dict) -> bytes:
     header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
     values = [max(0, min(65535, int(row[band]))) for band in BAND_ORDER]
     payload = struct.pack(">HHHH", *values)
-    checksum = xor_checksum(payload)
+    checksum = xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
 
     return header + payload + bytes([checksum])
 
@@ -78,7 +78,7 @@ def packet_to_df(ser: serial.Serial) -> dict | None:
         return None
 
     alpha, beta, theta, delta = struct.unpack(">HHHH", packet[3:-1])
-    return {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
+    return {"alpha": alpha, "beta": beta, "theta": theta, "delta": delta}
 
 
 def transmit(df: pd.DataFrame, ser: serial.Serial) -> None:
@@ -95,8 +95,8 @@ def transmit(df: pd.DataFrame, ser: serial.Serial) -> None:
     """
     for _, row in df.iterrows():
         packet = df_to_packet(row)
-        print(f"packet: {packet}")
         ser.write(packet)
+        print(f"packet: {packet}")
 
 
 def receive(ser: serial.Serial, expected_rows: int) -> pd.DataFrame:

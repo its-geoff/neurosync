@@ -9,6 +9,7 @@ import threading
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
 BANDS = ["alpha", "beta", "theta", "delta"]
 WINDOW_SIZE = 50
@@ -26,6 +27,7 @@ class LiveGrapher:
     def __init__(self):
         self._queue: queue.Queue[pd.DataFrame] = queue.Queue(maxsize=1)
         self._history = pd.DataFrame(columns=["timestamp"] + BANDS)
+        self._sample_count = 0
         self._thread = threading.Thread(
             target=self._render_loop, daemon=True
         )
@@ -45,8 +47,13 @@ class LiveGrapher:
         Returns:
             None.
         """
+        freq_row = freq_row.copy()
+        n = len(freq_row)
+        freq_row["timestamp"] = (self._sample_count + np.arange(n)) * 0.5
+        self._sample_count += n
+
         try:
-            self._queue.get_nowait()  # evict stale frame
+            self._queue.get_nowait()
         except queue.Empty:
             pass
         self._queue.put(freq_row)
@@ -68,8 +75,8 @@ class LiveGrapher:
             for ax, c in zip(axes, colors)
         ]
         for ax, band in zip(axes, BANDS):
-            ax.set_ylabel(band)
-        axes[-1].set_xlabel("timestamp")
+            ax.set_ylabel(f"{band} (Hz)")
+        axes[-1].set_xlabel("elapsed time (sec)")
         plt.tight_layout()
         plt.show()
 
@@ -84,7 +91,15 @@ class LiveGrapher:
                     line.set_xdata(self._history["timestamp"].values)
                     line.set_ydata(self._history[band].values)
                     ax.relim()
-                    ax.autoscale_view()
+                    ax.autoscale_view(scaley=True)
+                    ax.set_xlim(
+                        self._history["timestamp"].iloc[0],
+                        self._history["timestamp"].iloc[-1]
+                    )
+                    ax.set_xticks(range(
+                        int(self._history["timestamp"].iloc[0]),
+                        int(self._history["timestamp"].iloc[-1]) + 1
+                    ))
 
                 fig.canvas.draw()
                 fig.canvas.flush_events()

@@ -50,7 +50,7 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
 
     window_size = 256  # sampling rate of Muse 2 headband
     step_size = 128  # 50% overlap between windows
-    columns = ["timestamp", "delta", "theta", "alpha", "beta"]
+    columns = ["timestamp", "alpha", "beta", "theta", "delta"]
     signal_cols = ["ch1", "ch2", "ch3", "ch4"]
     fft_df = pd.DataFrame(columns=columns)  # define FFT DataFrame
 
@@ -64,19 +64,19 @@ def transform_to_hz(data: pd.DataFrame) -> pd.DataFrame:
         freqs = fftfreq(window_size, 1 / window_size)
 
         # compute bands; square for band power
-        delta_band = np.sum(abs(fft_vals[(freqs >= 0.5) & (freqs < 4)]) ** 2)
-        theta_band = np.sum(abs(fft_vals[(freqs >= 4) & (freqs < 8)]) ** 2)
         alpha_band = np.sum(abs(fft_vals[(freqs >= 8) & (freqs < 13)]) ** 2)
         beta_band = np.sum(abs(fft_vals[(freqs >= 13) & (freqs < 32)]) ** 2)
+        delta_band = np.sum(abs(fft_vals[(freqs >= 0.5) & (freqs < 4)]) ** 2)
+        theta_band = np.sum(abs(fft_vals[(freqs >= 4) & (freqs < 8)]) ** 2)
 
         new_row = pd.DataFrame(
             [
                 {
                     "timestamp": data["timestamp"].iloc[start],
-                    "delta": float(delta_band),
-                    "theta": float(theta_band),
                     "alpha": float(alpha_band),
                     "beta": float(beta_band),
+                    "delta": float(delta_band),
+                    "theta": float(theta_band),
                 }
             ],
             columns=columns,

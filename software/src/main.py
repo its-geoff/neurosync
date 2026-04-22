@@ -47,10 +47,14 @@ def connect_and_process(ser: serial.Serial) -> None:
                     buffer[:256],
                     columns=["timestamp", "ch1", "ch2", "ch3", "ch4"],
                 )
+                print("before processing")
                 result = data_processing.process_pipeline(window_df)
+                print("after processing")
                 band_power_df = result["frequency_data"]
                 transmission.transmit(band_power_df, ser)
+                print("after transmission")
                 grapher.put(band_power_df)
+                print("after graphing")
 
                 buffer = buffer[128:]  # 50% window overlap
     except KeyboardInterrupt:

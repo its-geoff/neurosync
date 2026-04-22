@@ -59,7 +59,7 @@ class TestFPGAPacketFormatE2E:
         alpha, beta, theta, delta = 1000, 2000, 3000, 4000
         fpga_pkt = build_fpga_packet(alpha, beta, theta, delta)
 
-        row = pd.Series({"delta": delta, "theta": theta, "alpha": alpha, "beta": beta})
+        row = pd.Series({"alpha": alpha, "beta": beta, "theta": theta, "delta": delta})
         py_pkt = transmission.df_to_packet(row)
 
         assert fpga_pkt[:11] == py_pkt[:11], "header/payload bytes do not match"
@@ -71,7 +71,7 @@ class TestFPGAPacketFormatE2E:
         alpha, beta, theta, delta = 1000, 2000, 3000, 4000
         fpga_pkt = build_fpga_packet(alpha, beta, theta, delta)
 
-        row = pd.Series({"delta": delta, "theta": theta, "alpha": alpha, "beta": beta})
+        row = pd.Series({"alpha": alpha, "beta": beta, "theta": theta, "delta": delta})
         py_pkt = transmission.df_to_packet(row)
 
         xor_chk = fpga_pkt[-1]

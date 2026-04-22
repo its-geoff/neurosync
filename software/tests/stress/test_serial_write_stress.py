@@ -14,7 +14,7 @@ import transmission
 
 def make_band_row(delta=1000, theta=2000, alpha=3000, beta=4000):
     return pd.Series(
-        {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
+        {"alpha": alpha, "beta": beta, "theta": theta, "delta": delta}
     )
 
 

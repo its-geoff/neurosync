@@ -68,7 +68,7 @@ class TestFPGAPacketFormatE2E:
         fpga_pkt = build_fpga_packet(alpha, beta, theta, delta)
 
         row = pd.Series(
-            {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
+            {"alpha": alpha, "beta": beta, "theta": theta, "delta": delta}
         )
         py_pkt = transmission.df_to_packet(row)
 
@@ -84,7 +84,7 @@ class TestFPGAPacketFormatE2E:
         fpga_pkt = build_fpga_packet(alpha, beta, theta, delta)
 
         row = pd.Series(
-            {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
+            {"alpha": alpha, "beta": beta, "theta": theta, "delta": delta}
         )
         py_pkt = transmission.df_to_packet(row)
 
