@@ -77,7 +77,7 @@ def _patch_resolve():
 def _patch_fft(return_value=None):
     rv = (
         pd.DataFrame(
-            [{"timestamp": 1, "alpha": 1, "beta": 2, "theta": 3, "delta": 4}]
+            [{"timestamp": 1, "beta": 1, "alpha": 2, "theta": 3, "delta": 4}]
         )
         if return_value is None
         else return_value

@@ -114,7 +114,7 @@ module UART_RX_To_7_Seg_Top (
     // EEG Parser
     // ============================================================
     logic        packet_valid;
-    logic [15:0] alpha, beta, theta, delta;
+    logic [15:0] beta, alpha, theta, delta;
 
     EEG_Packet_Parser u_parser (
         .i_Clock        (i_Clock),

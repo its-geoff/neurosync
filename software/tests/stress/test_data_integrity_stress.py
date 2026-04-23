@@ -22,7 +22,7 @@ def make_raw_eeg(n_samples=256, seed=0):
 
 def make_band_row(delta=1000, theta=2000, alpha=3000, beta=4000):
     return pd.Series(
-        {"alpha": alpha, "beta": beta, "theta": theta, "delta": delta}
+        {"beta": beta, "alpha": alpha, "theta": theta, "delta": delta}
     )
 
 
@@ -31,7 +31,7 @@ class TestDataIntegrityUnderLoad:
     def test_fft_produces_finite_values_for_large_input(self):
         df = make_raw_eeg(2048)
         result = data_processing.transform_to_hz(df)
-        for band in ["alpha", "beta", "theta", "delta"]:
+        for band in ["beta", "alpha", "theta", "delta"]:
             assert np.isfinite(
                 result[band].values
             ).all(), f"{band} contains inf/nan"

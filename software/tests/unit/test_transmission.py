@@ -21,7 +21,7 @@ SAMPLE_ROW = {"delta": 41, "theta": 86, "alpha": 31, "beta": 12}
 def build_valid_packet(delta=41, theta=86, alpha=31, beta=12) -> bytes:
     """Build a packet using the same logic as df_to_packet for use in tests."""
     header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
-    payload = struct.pack(">HHHH", alpha, beta, theta, delta)
+    payload = struct.pack(">HHHH", beta, alpha, theta, delta)
     checksum = xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
     return header + payload + bytes([checksum])
 
@@ -97,7 +97,7 @@ class TestDfToPacket:
     def test_payload_encodes_correct_values(self):
         packet = df_to_packet(SAMPLE_ROW)
         payload = packet[3:-1]
-        alpha, beta, theta, delta = struct.unpack(">HHHH", payload)
+        beta, alpha, theta, delta = struct.unpack(">HHHH", payload)
 
         assert alpha == SAMPLE_ROW["alpha"]
         assert beta == SAMPLE_ROW["beta"]
@@ -161,7 +161,7 @@ class TestPacketToDf:
 class TestTransmit:
     def _convert_to_df(self, rows: dict) -> pd.DataFrame:
         """Convert a dictionary into a pandas DataFrame."""
-        return pd.DataFrame(rows, columns=["alpha", "beta", "theta", "delta"])
+        return pd.DataFrame(rows, columns=["beta", "alpha", "theta", "delta"])
 
     def _mock_serial(self, data: bytes) -> MagicMock:
         """Create a mock serial connection and return the object."""
@@ -254,7 +254,7 @@ class TestReceive:
         mock_ser = self._mock_serial(packet)
         result = receive(mock_ser, 1)
 
-        assert list(result.columns) == ["alpha", "beta", "theta", "delta"]
+        assert list(result.columns) == ["beta", "alpha", "theta", "delta"]
 
     def test_row_correct_values(self):
         packet = build_valid_packet()

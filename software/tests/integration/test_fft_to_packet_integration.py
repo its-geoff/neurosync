@@ -29,7 +29,7 @@ class TestFFTToPacketIntegration:
     def test_fft_output_band_powers_fit_in_uint16(self):
         df = make_raw_eeg(256)
         freq_df = data_processing.transform_to_hz(df)
-        for band in ["alpha", "beta", "theta", "delta"]:
+        for band in ["beta", "alpha", "theta", "delta"]:
             max_val = freq_df[band].max()
             assert max_val <= 65535, (
                 f"{band} max={max_val:.2f} exceeds uint16 range. "
@@ -41,7 +41,7 @@ class TestFFTToPacketIntegration:
         freq_df = data_processing.transform_to_hz(df)
 
         row = freq_df.iloc[0].copy()
-        for band in ["alpha", "beta", "theta", "delta"]:
+        for band in ["beta", "alpha", "theta", "delta"]:
             row[band] = min(int(row[band]), 65535)
 
         packet = transmission.df_to_packet(row)
@@ -57,7 +57,7 @@ class TestFFTToPacketIntegration:
         errors = []
         for _, row in freq_df.iterrows():
             clamped = row.copy()
-            for band in ["alpha", "beta", "theta", "delta"]:
+            for band in ["beta", "alpha", "theta", "delta"]:
                 clamped[band] = min(int(clamped[band]), 65535)
             try:
                 transmission.df_to_packet(clamped)

@@ -54,7 +54,7 @@ def build_packet(alpha: int, beta: int, theta: int, delta: int) -> bytes:
 
 # ──────────────────────────────────────────────
 #  Animation modes  (each is a generator)
-#  Yields (alpha, beta, theta, delta) tuples
+#  Yields (beta, alpha, theta, delta) tuples
 # ──────────────────────────────────────────────
 
 
@@ -129,7 +129,7 @@ def mode_individual(rate_hz=50):
     Press Enter with no input to keep current values.
     """
     vals = [0x8000, 0x8000, 0x8000, 0x8000]
-    names = ["alpha", "beta", "theta", "delta"]
+    names = ["beta", "alpha", "theta", "delta"]
     print("  Enter  '<band> <0-65535>'  e.g.  'alpha 50000'")
     print("  or just press Enter to keep current values.")
     print("  Ctrl+C to quit.\n")
@@ -268,8 +268,8 @@ def main():
 
     try:
         while True:
-            alpha, beta, theta, delta = next(gen)
-            pkt = build_packet(alpha, beta, theta, delta)
+            beta, alpha, theta, delta = next(gen)
+            pkt = build_packet(beta, alpha, theta, delta)
             ser.write(pkt)
             pkt_count += 1
 
