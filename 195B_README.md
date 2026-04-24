@@ -4,8 +4,8 @@
 
 ## Status
 
-![Python CI/CD](https://github.com/its-geoff/neurosync/actions/workflows/python-ci.yaml/badge.svg)
-[![codecov](https://codecov.io/gh/its-geoff/neurosync/branch/main/graph/badge.svg?token=JBGWUQ796L)](https://codecov.io/gh/its-geoff/neurosync)
+![Python CI/CD](https://github.com/its-geoff/neurosync/actions/workflows/python-ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/its-geoff/neurosync/branch/main/graph/badge.svg?token=JBGWUQ796L)](https://codecov.io/gh/its-geoff/neurosync/tree/main)
 
 ## Team
 
