@@ -38,7 +38,7 @@ NeuroSync addresses the problem by utilizing electroencephalogram (EEG) technolo
 
 ## Demo
 
-[Link to demo video or GIF]
+[NeuroSync Demo](https://drive.google.com/file/d/1kn_nMbmOZbIO2XWJ2OIjfFBSnLMHPttt/view?usp=sharing)
 
 **Live Demo:** [URL if deployed]
 
