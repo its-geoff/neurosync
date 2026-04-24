@@ -18,7 +18,7 @@ build/
 
 # coverage
 .coverage
-!docs/evaluation/coverage-report/
+!docs/evaluation/coverage-report/**
 
 # processed data
 data/processed.csv
