@@ -13,10 +13,12 @@ import unittest.mock as mock
 
 def pytest_configure(config):
     import matplotlib
+
     matplotlib.use("Agg")
 
     # suppresses matplotlib output
     import matplotlib.pyplot as plt
+
     plt.show = lambda *a, **k: None
     plt.pause = lambda *a, **k: None
 
