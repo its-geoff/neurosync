@@ -6,7 +6,6 @@ Python CRC-8 scheme.
 """
 
 import pandas as pd
-import pytest
 
 import transmission
 
