@@ -6,7 +6,6 @@ Python CRC-8 scheme.
 """
 
 import pandas as pd
-import pytest
 
 import transmission
 
@@ -60,10 +59,6 @@ class TestFPGAPacketFormatE2E:
         bytes. Only the final checksum byte differs due to algorithm mismatch
         (FPGA uses XOR, Python uses CRC-8). Any hardware fix must align these.
         """
-        pytest.skip(
-            "Pending hardware update: FPGA must align byte order and checksum"
-            " algorithm with Python"
-        )
         alpha, beta, theta, delta = 1000, 2000, 3000, 4000
         fpga_pkt = build_fpga_packet(alpha, beta, theta, delta)
 
