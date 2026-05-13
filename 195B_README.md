@@ -1,6 +1,6 @@
 # NeuroSync
 
-> This project uses an EEG headband with connected software to filter brainwaves and translate them to emotions.
+> This project uses an EEG headband with connected software to filter brainwaves and visualize brain activity in real time.
 
 ## Status
 
@@ -22,17 +22,16 @@
 
 ## Problem Statement
 
-Emotions are complex; students may have trouble comprehending their emotional state to mental health professionals. Traditional counseling oftentimes relies heavily on verbal communication and subjective observation, making it difficult to accurately gauge real time emotional and cognitive state.
+Emotions are complex; students may have trouble communicating their emotional state to mental health professionals. Traditional counseling relies heavily on verbal communication and subjective observation, making it difficult to accurately gauge a client's real time cognitive state.
 
 ## Solution
 
-NeuroSync addresses the problem by utilizing electroencephalogram (EEG) technology along with Field Programmable Gate Array (FPGA) based processing in order to interpret, visualize, and analyze emotional states concurrently. This product will enhance the quality of counseling sessions and leave students feeling more fulfilled after talking to mental health professionals. This system aims to ensure that counseling be responsive, accurate, and effective.
+NeuroSync addresses this by using EEG technology and an FPGA to acquire, process, and visualize brainwave activity in real time. The system streams EEG data from a Muse 2 headband, computes frequency band power on the software side, and transmits the results to an FPGA for hardware-accelerated visualization over VGA. The goal is to give counselors a more objective view of what is happening with their client during a session.
 
 ### Key Features
 
 - Real-time EEG signal acquisition and band power calculation
 - Hardware-accelerated brainwave visualization on FPGA
-- Multi-dimensional emotional state mapping (in progress)
 
 ---
 
