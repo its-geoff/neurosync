@@ -8,11 +8,11 @@ import queue
 import tkinter  # noqa: F401
 
 import matplotlib
+matplotlib.use("TkAgg")
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
-matplotlib.use("TkAgg")
 
 BANDS = ["beta", "alpha", "theta", "delta"]
 WINDOW_SIZE = 50
