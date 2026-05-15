@@ -1,7 +1,7 @@
 """graphing.py.
 
-Graphs brainwave band data dynamically using a canvas timer on the main thread.
-The acquisition loop feeds data via put(); the timer handles redraws.
+Graphs brainwave band data dynamically using a timer on the main thread. The
+acquisition loop feeds data via put(); the timer handles redraws.
 """
 
 import queue
