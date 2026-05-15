@@ -13,7 +13,6 @@ import unittest.mock as mock
 
 import pytest
 
-
 headless = pytest.mark.skipif(
     not os.environ.get("DISPLAY") and os.name != "nt",
     reason="requires display",

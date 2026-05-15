@@ -7,11 +7,12 @@ Processes EEG data for Muse 2, including:
 """
 
 import os
-import graphing     # noqa: F401
 
 import numpy as np
 import pandas as pd
 from scipy.fft import fft, fftfreq
+
+import graphing  # noqa: F401
 
 # global variables
 FOLDER_NAME = os.path.abspath(os.path.join("..", "data"))
