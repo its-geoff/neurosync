@@ -67,10 +67,8 @@ class LiveGrapher:
         try:
             stale = self._queue.get_nowait()
             evicted = True
-            print(
-                f"[QUEUE] evicted stale frame at t={stale['timestamp'].
-                iloc[-1]:.1f}s"
-            )
+            t = stale["timestamp"].iloc[-1]
+            print(f"[QUEUE] evicted stale frame at t={t:.1f}s")
         except queue.Empty:
             pass
 
