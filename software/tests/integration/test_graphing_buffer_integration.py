@@ -60,14 +60,14 @@ def large_df():
 class TestGraphingBufferIntegration:
 
     def test_put_and_update_produce_correct_columns(self, grapher, sample_df):
-        """Columns in history after a put/update cycle match expected 
+        """Columns in history after a put/update cycle match expected
         schema."""
         grapher.put(sample_df)
         grapher._update()
         assert list(grapher._history.columns) == ["timestamp"] + BANDS
 
     def test_put_and_update_preserve_band_values(self, grapher, sample_df):
-        """Band values written via put() survive through _update() into 
+        """Band values written via put() survive through _update() into
         history."""
         grapher.put(sample_df)
         grapher._update()
@@ -75,14 +75,14 @@ class TestGraphingBufferIntegration:
             assert (grapher._history[band] == expected).all()
 
     def test_windowing_clips_history_to_window_size(self, grapher, large_df):
-        """History must not exceed WINDOW_SIZE rows after processing a large 
+        """History must not exceed WINDOW_SIZE rows after processing a large
         frame."""
         grapher.put(large_df)
         grapher._update()
         assert len(grapher._history) <= WINDOW_SIZE
 
     def test_windowing_retains_most_recent_rows(self, grapher, large_df):
-        """After windowing, history contains the tail of the input, not the 
+        """After windowing, history contains the tail of the input, not the
         head."""
         grapher.put(large_df)
         grapher._update()
@@ -113,7 +113,7 @@ class TestGraphingBufferIntegration:
         grapher._fig.canvas.draw.assert_called()
 
     def test_reset_between_sessions_clears_history(self, grapher, sample_df):
-        """reset() between two sessions must prevent first session data 
+        """reset() between two sessions must prevent first session data
         leaking."""
         grapher.put(sample_df)
         grapher._update()
@@ -123,7 +123,7 @@ class TestGraphingBufferIntegration:
         assert len(grapher._history) == 1
 
     def test_timestamps_are_monotonic_across_puts(self, grapher, sample_df):
-        """Timestamps assigned by put() must increase monotonically across 
+        """Timestamps assigned by put() must increase monotonically across
         calls."""
         grapher.put(sample_df.iloc[:5])
         grapher._update()

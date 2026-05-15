@@ -5,10 +5,11 @@ The acquisition loop feeds data via put(); the timer handles redraws.
 """
 
 import queue
+
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib
 
 matplotlib.use("TkAgg")
 
