@@ -64,6 +64,9 @@ class LiveGrapher:
         Returns:
             None.
         """
+        if freq_row.empty:
+            return
+
         freq_row = freq_row.copy()
         n = len(freq_row)
         freq_row["timestamp"] = (self._sample_count + np.arange(n)) * 0.5
