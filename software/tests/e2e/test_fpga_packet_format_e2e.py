@@ -10,7 +10,7 @@ import pandas as pd
 import transmission
 
 
-def build_fpga_packet(alpha, beta, theta, delta):
+def build_fpga_packet(beta, alpha, theta, delta):
     """Build the 12-byte FPGA packet as eeg_test_sender.py does.
     Checksum is XOR of LEN byte and all 8 payload bytes.
     """
@@ -63,7 +63,7 @@ class TestFPGAPacketFormatE2E:
         fpga_pkt = build_fpga_packet(alpha, beta, theta, delta)
 
         row = pd.Series(
-            {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
+            {"beta": beta, "alpha": alpha, "theta": theta, "delta": delta}
         )
         py_pkt = transmission.df_to_packet(row)
 
@@ -75,11 +75,11 @@ class TestFPGAPacketFormatE2E:
         """XOR checksum (FPGA) and CRC-8 (Python) produce different results.
         This is a documented architectural gap, not an accident.
         """
-        alpha, beta, theta, delta = 1000, 2000, 3000, 4000
-        fpga_pkt = build_fpga_packet(alpha, beta, theta, delta)
+        beta, alpha, theta, delta = 1000, 2000, 3000, 4000
+        fpga_pkt = build_fpga_packet(beta, alpha, theta, delta)
 
         row = pd.Series(
-            {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
+            {"beta": beta, "alpha": alpha, "theta": theta, "delta": delta}
         )
         py_pkt = transmission.df_to_packet(row)
 

@@ -177,7 +177,7 @@ def main():
         "--band",
         type=str,
         default=None,
-        help="Band to plot (alpha, beta, theta, delta, gamma)",
+        help="Band to plot (beta, alpha, theta, delta, gamma)",
     )
     parser.add_argument(
         "--sf",

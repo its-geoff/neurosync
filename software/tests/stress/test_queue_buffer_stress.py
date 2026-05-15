@@ -6,36 +6,53 @@ Stress tests for the graphing queue buffer under producer/consumer pressure.
 import queue
 import threading
 import time
-import unittest.mock as mock
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pandas as pd
+import pytest
 
 import graphing
 
 
+@pytest.fixture
+def mock_grapher():
+    with patch("graphing.plt") as mock_plt:
+        mock_fig = MagicMock()
+        mock_axes = [MagicMock() for _ in range(4)]
+        for ax in mock_axes:
+            ax.plot.return_value = (MagicMock(),)
+        mock_plt.subplots.return_value = (mock_fig, mock_axes)
+        mock_fig.canvas.new_timer.return_value = MagicMock()
+        grapher = graphing.LiveGrapher()
+        yield grapher
+
+
+def make_df(n):
+    return pd.DataFrame(
+        {
+            "timestamp": np.arange(n, dtype=float),
+            "delta": np.ones(n),
+            "theta": np.ones(n) * 2,
+            "alpha": np.ones(n) * 3,
+            "beta": np.ones(n) * 4,
+        }
+    )
+
+
 class TestQueueBufferStress:
 
-    def test_single_slot_queue_does_not_block_producer(self):
+    def test_single_slot_queue_does_not_block_producer(self, mock_grapher):
         n = 200
-        fft_df = pd.DataFrame(
-            {
-                "timestamp": np.arange(n, dtype=float),
-                "delta": np.ones(n),
-                "theta": np.ones(n),
-                "alpha": np.ones(n),
-                "beta": np.ones(n),
-            }
-        )
-        buf = queue.Queue(maxsize=1)
-        with mock.patch("graphing.time.sleep"):
-            start = time.perf_counter()
-            graphing.write_data(fft_df, buf)
-            elapsed = time.perf_counter() - start
+        fft_df = make_df(n)
+        start = time.perf_counter()
+        for i in range(len(fft_df)):
+            mock_grapher.put(fft_df.iloc[i : i + 1])
+        elapsed = time.perf_counter() - start
         print(f"\n[queue stress n={n}] {elapsed:.3f}s")
         assert elapsed < 2.0
 
-    def test_slow_consumer_does_not_deadlock_producer(self):
+    def test_slow_consumer_does_not_deadlock_producer(self, mock_grapher):
         n = 100
         fft_df = pd.DataFrame(
             {
@@ -46,49 +63,39 @@ class TestQueueBufferStress:
                 "beta": np.random.rand(n),
             }
         )
-        buf = queue.Queue(maxsize=1)
         consumed = []
 
         def slow_consumer():
             deadline = time.monotonic() + 10
             while time.monotonic() < deadline:
                 try:
-                    item = buf.get(timeout=0.3)
+                    item = mock_grapher._queue.get(timeout=0.3)
                     consumed.append(item)
                     time.sleep(0.05)
                 except queue.Empty:
                     break
 
-        with mock.patch("graphing.time.sleep"):
-            producer = threading.Thread(
-                target=graphing.write_data, args=(fft_df, buf)
-            )
-            consumer = threading.Thread(target=slow_consumer)
-            producer.start()
-            consumer.start()
-            producer.join(timeout=10)
-            consumer.join(timeout=10)
+        def producer():
+            for i in range(len(fft_df)):
+                mock_grapher.put(fft_df.iloc[i : i + 1])
+
+        producer_thread = threading.Thread(target=producer)
+        consumer_thread = threading.Thread(target=slow_consumer)
+        producer_thread.start()
+        consumer_thread.start()
+        producer_thread.join(timeout=10)
+        consumer_thread.join(timeout=10)
 
         assert (
-            not producer.is_alive()
+            not producer_thread.is_alive()
         ), "producer thread still running (deadlock?)"
 
-    def test_final_frame_always_present_after_write(self):
+    def test_final_frame_always_present_after_put(self, mock_grapher):
         for n in [10, 50, 100, 200]:
-            fft_df = pd.DataFrame(
-                {
-                    "timestamp": np.arange(n, dtype=float),
-                    "delta": np.ones(n),
-                    "theta": np.ones(n) * 2,
-                    "alpha": np.ones(n) * 3,
-                    "beta": np.ones(n) * 4,
-                }
-            )
-            buf = queue.Queue(maxsize=1)
-            with mock.patch("graphing.time.sleep"):
-                graphing.write_data(fft_df, buf)
-            assert not buf.empty(), f"queue empty after write_data with n={n}"
-            frame = buf.get_nowait()
+            mock_grapher.reset()
+            fft_df = make_df(n)
+            for i in range(len(fft_df)):
+                mock_grapher.put(fft_df.iloc[i : i + 1])
             assert (
-                len(frame) == n
-            ), f"n={n}: expected {n} rows, got {len(frame)}"
+                not mock_grapher._queue.empty()
+            ), f"queue empty after put with n={n}"

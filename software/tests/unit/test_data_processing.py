@@ -42,10 +42,10 @@ def test_transform_to_hz_valid():
     assert isinstance(result, pd.DataFrame)
     assert list(result.columns) == [
         "timestamp",
-        "delta",
-        "theta",
-        "alpha",
         "beta",
+        "alpha",
+        "theta",
+        "delta",
     ]
 
 
@@ -100,7 +100,7 @@ def test_get_stats_valid():
 
 
 def test_get_stats_empty():
-    empty_df = pd.DataFrame(columns=["alpha", "beta", "theta", "delta"])
+    empty_df = pd.DataFrame(columns=["beta", "alpha", "theta", "delta"])
     result = get_stats(empty_df)
     assert result is None
 

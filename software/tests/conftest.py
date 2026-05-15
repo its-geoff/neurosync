@@ -6,9 +6,17 @@ Sets matplotlib to the non-interactive Agg backend to suppress
 display windows during testing.
 """
 
+import os
 import sys
 import types
 import unittest.mock as mock
+
+import pytest
+
+headless = pytest.mark.skipif(
+    not os.environ.get("DISPLAY") and os.name != "nt",
+    reason="requires display",
+)
 
 
 def pytest_configure(config):
@@ -16,7 +24,6 @@ def pytest_configure(config):
 
     matplotlib.use("Agg")
 
-    # suppresses matplotlib output
     import matplotlib.pyplot as plt
 
     plt.show = lambda *a, **k: None

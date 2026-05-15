@@ -35,7 +35,7 @@ def validate_packet(packet: bytes) -> bool:
     """
     payload = packet[3:-1]
     received_checksum = packet[-1]
-    expected_checksum = xor_checksum(payload)
+    expected_checksum = xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
 
     return received_checksum == expected_checksum
 
@@ -48,15 +48,15 @@ def df_to_packet(row: dict) -> bytes:
 
     Returns:
         bytes: A set of bytes in the form of a UART packet.
-            [header][delta(u16)][theta(u16)][alpha(u16)][beta(u16)][crc8]
+            [header][beta(u16)][alpha(u16)][theta(u16)][delta(u16)][crc8]
     """
-    BAND_ORDER = ["alpha", "beta", "theta", "delta"]
+    BAND_ORDER = ["beta", "alpha", "theta", "delta"]
 
     # define header, payload, and checksum
     header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
     values = [max(0, min(65535, int(row[band]))) for band in BAND_ORDER]
     payload = struct.pack(">HHHH", *values)
-    checksum = xor_checksum(payload)
+    checksum = xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
 
     return header + payload + bytes([checksum])
 
@@ -77,8 +77,8 @@ def packet_to_df(ser: serial.Serial) -> dict | None:
     if not validate_packet(packet):
         return None
 
-    alpha, beta, theta, delta = struct.unpack(">HHHH", packet[3:-1])
-    return {"delta": delta, "theta": theta, "alpha": alpha, "beta": beta}
+    beta, alpha, theta, delta = struct.unpack(">HHHH", packet[3:-1])
+    return {"beta": beta, "alpha": alpha, "theta": theta, "delta": delta}
 
 
 def transmit(df: pd.DataFrame, ser: serial.Serial) -> None:
@@ -95,7 +95,6 @@ def transmit(df: pd.DataFrame, ser: serial.Serial) -> None:
     """
     for _, row in df.iterrows():
         packet = df_to_packet(row)
-        print(f"packet: {packet}")
         ser.write(packet)
 
 
@@ -117,4 +116,4 @@ def receive(ser: serial.Serial, expected_rows: int) -> pd.DataFrame:
         if row:
             rows.append(row)
 
-    return pd.DataFrame(rows, columns=["alpha", "beta", "theta", "delta"])
+    return pd.DataFrame(rows, columns=["beta", "alpha", "theta", "delta"])

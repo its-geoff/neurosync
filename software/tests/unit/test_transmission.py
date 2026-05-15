@@ -21,8 +21,8 @@ SAMPLE_ROW = {"delta": 41, "theta": 86, "alpha": 31, "beta": 12}
 def build_valid_packet(delta=41, theta=86, alpha=31, beta=12) -> bytes:
     """Build a packet using the same logic as df_to_packet for use in tests."""
     header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
-    payload = struct.pack(">HHHH", alpha, beta, theta, delta)
-    checksum = xor_checksum(payload)
+    payload = struct.pack(">HHHH", beta, alpha, theta, delta)
+    checksum = xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
     return header + payload + bytes([checksum])
 
 
@@ -31,7 +31,7 @@ class TestValidatePacket:
     def test_valid_packet_returns_true(self):
         header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
         payload = struct.pack(">HHHH", 41, 86, 31, 12)
-        checksum = xor_checksum(payload)
+        checksum = xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
         packet = header + payload + bytes([checksum])
 
         assert validate_packet(packet) is True
@@ -39,7 +39,7 @@ class TestValidatePacket:
     def test_invalid_checksum_returns_false(self):
         header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
         payload = struct.pack(">HHHH", 41, 86, 31, 12)
-        checksum = xor_checksum(payload)
+        checksum = xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
         invalid_checksum = (checksum + 1) % 256
         packet = header + payload + bytes([invalid_checksum])
 
@@ -50,7 +50,7 @@ class TestValidatePacket:
         payload = struct.pack(">HHHH", 41, 86, 31, 12)
         invalid_payload = bytearray(payload)
         invalid_payload[0] ^= 0xFF
-        checksum = xor_checksum(payload)
+        checksum = xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
         packet = header + invalid_payload + bytes([checksum])
 
         assert validate_packet(packet) is False
@@ -58,7 +58,7 @@ class TestValidatePacket:
     def test_single_byte_payload_returns_true(self):
         header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
         payload = bytes([0x4A])
-        checksum = xor_checksum(payload)
+        checksum = xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
         packet = header + payload + bytes([checksum])
 
         assert validate_packet(packet) is True
@@ -66,7 +66,7 @@ class TestValidatePacket:
     def test_zero_payload_returns_true(self):
         header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
         payload = struct.pack(">HHHH", 0, 0, 0, 0)
-        checksum = xor_checksum(payload)
+        checksum = xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
         packet = header + payload + bytes([checksum])
 
         assert validate_packet(packet) is True
@@ -74,7 +74,7 @@ class TestValidatePacket:
     def test_max_value_payload_returns_true(self):
         header = bytes([SYNC_BYTE_1, SYNC_BYTE_2, PAYLOAD_LENGTH])
         payload = struct.pack(">HHHH", 65535, 65535, 65535, 65535)
-        checksum = xor_checksum(payload)
+        checksum = xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
         packet = header + payload + bytes([checksum])
 
         assert validate_packet(packet) is True
@@ -97,7 +97,7 @@ class TestDfToPacket:
     def test_payload_encodes_correct_values(self):
         packet = df_to_packet(SAMPLE_ROW)
         payload = packet[3:-1]
-        alpha, beta, theta, delta = struct.unpack(">HHHH", payload)
+        beta, alpha, theta, delta = struct.unpack(">HHHH", payload)
 
         assert alpha == SAMPLE_ROW["alpha"]
         assert beta == SAMPLE_ROW["beta"]
@@ -108,7 +108,7 @@ class TestDfToPacket:
         packet = df_to_packet(SAMPLE_ROW)
         payload = packet[3:-1]
 
-        assert packet[-1] == xor_checksum(payload)
+        assert packet[-1] == xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
 
     def test_zero_payload_returns_true(self):
         row = {"delta": 0, "theta": 0, "alpha": 0, "beta": 0}
@@ -142,7 +142,7 @@ class TestPacketToDf:
 
     def test_invalid_checksum_returns_none(self):
         payload = struct.pack(">HHHH", 41, 86, 31, 12)
-        checksum = xor_checksum(payload)
+        checksum = xor_checksum(bytes([PAYLOAD_LENGTH]) + payload)
         invalid_checksum = (checksum + 1) % 256
         packet = payload + bytes([invalid_checksum])
         mock_ser = self._mock_serial(packet)
@@ -161,7 +161,7 @@ class TestPacketToDf:
 class TestTransmit:
     def _convert_to_df(self, rows: dict) -> pd.DataFrame:
         """Convert a dictionary into a pandas DataFrame."""
-        return pd.DataFrame(rows, columns=["alpha", "beta", "theta", "delta"])
+        return pd.DataFrame(rows, columns=["beta", "alpha", "theta", "delta"])
 
     def _mock_serial(self, data: bytes) -> MagicMock:
         """Create a mock serial connection and return the object."""
@@ -254,7 +254,7 @@ class TestReceive:
         mock_ser = self._mock_serial(packet)
         result = receive(mock_ser, 1)
 
-        assert list(result.columns) == ["alpha", "beta", "theta", "delta"]
+        assert list(result.columns) == ["beta", "alpha", "theta", "delta"]
 
     def test_row_correct_values(self):
         packet = build_valid_packet()

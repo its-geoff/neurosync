@@ -12,6 +12,7 @@ from pylsl import StreamInlet, resolve_byprop
 
 import data_processing  # local
 import transmission
+from graphing import LiveGrapher
 
 
 def connect_and_process(ser: serial.Serial) -> None:
@@ -25,39 +26,38 @@ def connect_and_process(ser: serial.Serial) -> None:
         None.
     """
     print("Resolving Muse 2 EEG stream...")
-    # Stream acquisition
-    # pylint: disable=unexpected-keyword-arg, too-many-function-args
     streams = resolve_byprop("type", "EEG")
     inlet = StreamInlet(streams[0])
     print("Stream acquired. Beginning transmission. Press Ctrl+C to stop.")
 
+    grapher = LiveGrapher()
+
     buffer = []
 
     try:
-        print("before loop")
         while True:
             sample, _ = inlet.pull_sample()
+            if sample is None:
+                continue
             buffer.append(sample[:5])
 
-            if len(buffer) >= 256:  # window size
+            if len(buffer) >= 256:
                 window_df = pd.DataFrame(
                     buffer[:256],
                     columns=["timestamp", "ch1", "ch2", "ch3", "ch4"],
                 )
-                print("before processing")
-                # change below:
-                # band_power_df = data_processing.transform_to_hz(window_df)
                 result = data_processing.process_pipeline(window_df)
-                print("after processing")
                 band_power_df = result["frequency_data"]
-                print("transmitting...")
                 transmission.transmit(band_power_df, ser)
-                print("after transmitting")
+                grapher.put(band_power_df)
+                buffer = buffer[128:]
 
-                buffer = buffer[128:]  # 50% window overlap
-                print("after loop")
+            grapher.pump()
+
     except KeyboardInterrupt:
         print("Stream interrupted. Closing.")
+    finally:
+        del inlet
 
 
 def main():
@@ -93,14 +93,6 @@ def main():
 
     else:
         print("Invalid mode")
-
-
-# OG main function below
-# def main():
-# initializes serial and automatically cleans up after connection closed
-# NOTE: change port before running
-# with serial.Serial(port="/dev/ttyUSB0", baudrate=115200, timeout=1) as ser:
-# connect_and_process(ser)
 
 
 if __name__ == "__main__":
