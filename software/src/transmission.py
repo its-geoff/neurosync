@@ -1,4 +1,4 @@
-"""transmission.py
+"""transmission.py.
 
 Calculates the checksum for input data using the CRC8 algorithm. Converts from
 pandas DataFrame to UART packet and vice versa.
