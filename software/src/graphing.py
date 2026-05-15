@@ -76,8 +76,8 @@ class LiveGrapher:
 
         self._queue.put(freq_row)
         print(
-            f"[QUEUE] put frame t={freq_row['timestamp'].iloc[-1]:.1f}s | 
-            evicted={evicted} | sample_count={self._sample_count}"
+            f"[QUEUE] put frame t={freq_row['timestamp'].iloc[-1]:.1f}s | "
+            f"evicted={evicted} | sample_count={self._sample_count}"
         )
 
     def pump(self) -> None:
@@ -120,8 +120,9 @@ class LiveGrapher:
         try:
             new_data = self._queue.get_nowait()
             print(
-                f"[RENDER] consumed frame t={new_data['timestamp']
-                .iloc[-1]:.1f}s | history_len={len(self._history)}"
+                f"[RENDER] consumed frame"
+                f"t={new_data['timestamp'].iloc[-1]:.1f}s | "
+                f"history_len={len(self._history)}"
             )
 
             self._history = pd.concat(
