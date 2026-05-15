@@ -1,4 +1,4 @@
-import queue
+import queue  # noqa: F401
 from unittest.mock import MagicMock, patch
 
 import numpy as np
