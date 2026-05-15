@@ -60,7 +60,8 @@ def large_df():
 class TestGraphingBufferIntegration:
 
     def test_put_and_update_produce_correct_columns(self, grapher, sample_df):
-        """Columns in history after a put/update cycle match expected schema."""
+        """Columns in history after a put/update cycle match expected 
+        schema."""
         grapher.put(sample_df)
         grapher._update()
         assert list(grapher._history.columns) == ["timestamp"] + BANDS
