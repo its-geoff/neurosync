@@ -54,7 +54,7 @@ def build_packet(alpha: int, beta: int, theta: int, delta: int) -> bytes:
 
 # ──────────────────────────────────────────────
 #  Animation modes  (each is a generator)
-#  Yields (beta, alpha, theta, delta) tuples
+#  Yields (alpha, beta, theta, delta) tuples
 # ──────────────────────────────────────────────
 
 
