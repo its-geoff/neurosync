@@ -7,6 +7,7 @@ Processes EEG data for Muse 2, including:
 """
 
 import os
+import graphing     # noqa: F401
 
 import numpy as np
 import pandas as pd

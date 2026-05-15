@@ -4,16 +4,18 @@ Graphs brainwave band data dynamically using a timer on the main thread. The
 acquisition loop feeds data via put(); the timer handles redraws.
 """
 
+import os
 import queue
-import tkinter  # noqa: F401
 
 import matplotlib
 
-matplotlib.use("TkAgg")
+if os.environ.get("DISPLAY") or os.name == "nt":
+    matplotlib.use("TkAgg")
+else:
+    matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
 
 BANDS = ["beta", "alpha", "theta", "delta"]
 WINDOW_SIZE = 50
