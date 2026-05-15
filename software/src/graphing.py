@@ -5,6 +5,7 @@ The acquisition loop feeds data via put(); the timer handles redraws.
 """
 
 import queue
+import tkinter
 
 import matplotlib
 import matplotlib.pyplot as plt
