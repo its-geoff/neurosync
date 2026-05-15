@@ -8,6 +8,7 @@ import queue
 import tkinter  # noqa: F401
 
 import matplotlib
+
 matplotlib.use("TkAgg")
 
 import matplotlib.pyplot as plt  # noqa: E402
